@@ -14,7 +14,7 @@ public class Main {
 	    int red = (pixel >> 16) & 0xff;
 	    int green = (pixel >> 8) & 0xff;
 	    int blue = (pixel) & 0xff;
-	    return new int[] {red, blue, green};
+	    return new int[] {red, green, blue};
 	  }
 	
 	public static int getPixelSum(int pixel){

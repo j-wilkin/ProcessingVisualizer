@@ -3,6 +3,9 @@ import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import com.xuggle.mediatool.IMediaWriter;
@@ -26,10 +29,12 @@ public class Sketch extends PApplet {
 	//File f;
 	PImage p;
 	int vidRate = 30;
+	int frames = 0;
 	long sTime;
 	long fTime;
 
 	boolean recording;
+	boolean recordingDone = false;
 	
 	//Sketch variables
 	
@@ -132,36 +137,16 @@ public class Sketch extends PApplet {
 	
 	  if (recording) {
 	      // the IMediaWriter should be open from avRecorderSetup(), which is called when 'r' is pressed
-	      if (imw.isOpen()) {
 	        // set cTime 
 	        // (not sure what cTime does, or if this if statement is necessary, havent removed to check)
 	        long cTime = System.nanoTime()-fTime;
 	        if (cTime >= (double)1000/vidRate) {
-	          
-	          // save image to file
-	          save("img.jpg");
-	          // load image to PImage
-	          p = loadImage("img.jpg");          
-	          // convert PImage to Image
-	          img = p.getImage();
-	          // convert Image to BufferedImage
-	          bgr.getGraphics().drawImage(img, 0, 0, new ImageObserver() {
-	              public boolean imageUpdate(Image i, int a, int b, int c, int d, int e) {
-	                return true;
-	              }
-	            }
-	          );
-	          
-	          // encode video
-	          imw.encodeVideo(0, bgr, System.nanoTime()-sTime, TimeUnit.NANOSECONDS);
-	          
-	          // set fTime
-	          // again, not sure what fTime does, scared to mess with it, I'll be mucking around with it eventually
-	          fTime = System.nanoTime();
+	        	// save image to file
+	            save("pics/img"+frames+".jpg");
+	            frames++;
+	            fTime = System.nanoTime();
 	        }
-	      }
-	    }
-	
+	  }
 	}
 
 	public void keyPressed() {
@@ -206,33 +191,29 @@ public class Sketch extends PApplet {
 	    TR_LEN += 5;
 	  }
 	  
-// Video recording keys	  
-//	  // if 'r' key is pressed while not recording...
-//	  if (key == 'r') {
-//	     if(!recording){
-//	        // Begin the recording process
-//	        println("Recording...");
-//	        // avRecorderSetup() is located right below
-//	        avRecorderSetup(); 
-//	        recording = true;  
-//	     }
-//	  }
-//	  // if 's' key is pressed while recording...
-//	  if (key == 's') {
-//	     if(recording){
-//	        // stop the recording process and save the recording
-//	        println("Saving...");
-//	        imw.flush();
-//	        imw.close();
-//	        recording = false;
-//	        // haven't figured this out just yet, but I'd like to delete img.jpg after all is said and done
-//	        //f = new File("img.jpg");
-//	        //f.delete();
-//	        println("Saved.");
-//	     }
-//	  }
-	  
-	  
+	  if (key == 'r') {
+		     if(!recording){
+		        // Begin the recording process
+		        //println("Recording...");
+		        recording = true;
+		        boolean success = (new File("pics")).mkdir();
+		        frames = 0;
+		     }
+		     else
+		    	 recording = false;
+		     	 recordingDone = true;
+		  }
+		  // if 's' key is pressed while recording...
+	  if (key == 's') {
+		     if(recordingDone==true){
+		        // stop the recording process and save the recording
+		        //println("Saving...");
+		        recording = false;
+		        encodeVideo();
+		        //println("Saved.");
+		     }
+		  }
+		  
 	}
 
 	// changes the Color of the particles based on mouse location, follows a rainbow pattern
@@ -292,22 +273,36 @@ public class Sketch extends PApplet {
 	  return res;
 	}
 	
-	public void avRecorderSetup(){
-		  // set the IMediaWriter to write to (and create) processingSketch.mp4
+	void encodeVideo(){
 		  imw = ToolFactory.makeWriter(sketchPath("processingSketch.mp4"));
-		  // open processingSketch.mp4
 		  imw.open();
-		  // ??
 		  imw.setForceInterleave(true);
-		  // start adding the stream
 		  imw.addVideoStream(0,0,IRational.make((double)vidRate),width,height);
-		  // ??
 		  isc = imw.getContainer().getStream(0).getStreamCoder();
-		  // ??
 		  bgr = new BufferedImage(width,height,BufferedImage.TYPE_3BYTE_BGR);
-		  // ??
 		  sTime = fTime = System.nanoTime();
-		}
-	
-	
+		  
+		  for(int i = 0; i<frames; i++){
+		     //p = loadImage("../pics/img"+i+".jpg");
+			 //img = p.getImage();
+			 URL spotU = null;
+			try {
+				spotU = new URL("pics/img"+i+".jpg");
+			} catch (MalformedURLException e1) {
+				e1.printStackTrace();
+			}
+		     img = getImage(spotU);		     
+			 
+		     bgr.getGraphics().drawImage(img, 0, 0, new ImageObserver() {
+		          public boolean imageUpdate(Image i, int a, int b, int c, int d, int e) {
+		              return true;
+		          }       
+		       }
+		     );
+		     imw.encodeVideo(0,bgr,System.nanoTime()-sTime, TimeUnit.NANOSECONDS);
+		  }
+		  
+		  imw.flush();
+		  imw.close();
+	}	
 }

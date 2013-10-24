@@ -8,17 +8,17 @@ int W = 500;
 int H = 336;
 
 int NTH_PARTICLE = 7;
-color PARTICLE_COLOR;
 boolean TRAIL = true;
 int TR_LEN = 90;
 boolean RAINBOW = false;
 
 //-------------------------------
-boolean FADE = false;
-int ALPH = 255;
-int TIME;
+int PALPH = 255;
+int WALPH = 0;
+int TIME, TIME2;
 boolean WAVE = false;
 boolean MOUSE = false;
+float WEIGHT = 5;
 //------------------------------^
 
 Particle mouse;            // particle on mouse position
@@ -33,13 +33,15 @@ int LENGTH;
 void setup() {
   // GRABS THE LOCATIONS OF PARTICLES FROM THE EDGE-DETECTED PICTURE
   int[] res;
-  input = loadStrings("particlesSpaceNew.txt");
-  //input = loadStrings("particlesRacecarNew.txt");
+  input = loadStrings("particlesColor.txt");
   LENGTH = input.length;
   locations = new float[2][LENGTH];
+  colors = new color[LENGTH];
   res = readInput(input);  
   W = res[0];
   H = res[1];
+  TIME = 0;
+  TIME2 = W/2;
    
   // Processing Setup
   size(W, H); 
@@ -58,13 +60,6 @@ void setup() {
   mouse.makeFixed();                         // don't let forces move it
   particles = new Particle[LENGTH];
   orgParticles = new Particle[LENGTH];
-  colors = new color[LENGTH];
-  
-  //------------------------
-  int rand1;
-  int rand2;
-  int rand3;
-  //-----------------------^
   
   // Makes the visible and anchor particles
   for(int i=0; i<LENGTH; i++) {
@@ -75,12 +70,6 @@ void setup() {
     physics.makeSpring(particles[i], orgParticles[i], 0.007, 0.1, 0);
     // make the moving particles get away from the mouse
     physics.makeAttraction(particles[i], mouse, -5000, 0.1);
-    //------------------------------
-    rand1 = (int)random(0,50);
-    rand2 = (int)random(0,50);
-    rand3 = (int)random(0,50);
-    colors[i] = color(200-rand1,200-rand1,255-rand3);
-    //-----------------------------^
   }
 }
  
@@ -89,7 +78,7 @@ void draw() {
   // Causes particle trails
   noStroke();
   if (TRAIL == true) {
-    fill(0, TR_LEN);
+      fill(0, TR_LEN);
   }
   else {
     fill(0,255);
@@ -97,26 +86,82 @@ void draw() {
   rect(0, 0, W, H);
   
   println("framerate: " + frameRate);
-  println("NTH_PARTICLE: " + NTH_PARTICLE);
+  //println("NTH_PARTICLE: " + NTH_PARTICLE);
   
   mouse.position().set(mouseX, mouseY, 0 );
-  PARTICLE_COLOR = setPartColor(mouseX);
   physics.tick();
-  float w;
   float posx, posy, wPosy;
   float temp = ((distance(particles[0].position().x(), mouseX, particles[0].position().y(), mouseY))/(distance(0.0, 0.0, (float)W, (float)H)));
   for(int i=0; i<LENGTH; i++) {
     posx = particles[i].position().x();
     posy = particles[i].position().y();
-    w = 2;
     //-------------------------------
     if (!WAVE && MOUSE) {
-      ALPH = (int)((distance(posx, mouseX, posy, mouseY))/(distance(0.0,0.0,(float)W,(float)H))*255);
+      PALPH = (int)((distance(posx, mouseX, posy, mouseY))/(distance(0.0,0.0,(float)W,(float)H))*255);
     }
     //------------------------------^
     if(i%NTH_PARTICLE == 0) {
-      if (RAINBOW) {
-        fill(PARTICLE_COLOR, ALPH);
+      
+      if (!WAVE) {
+        // We're displaying the image particles and perhaps fading out the wave particles
+        if (RAINBOW) {
+          // rainbow fill for image particle
+          //fill(rainbowColor(mouseX),PALPH);
+          // test, rainbow based on x location of particle
+          fill(rainbowColor(posx),PALPH);
+        }
+        // image particle fill
+        else {
+          // else we're using colors from input
+          fill(colors[i],PALPH);
+        }
+        ellipse(posx,posy,WEIGHT,WEIGHT);
+        if (WALPH > 0) {
+          if (RAINBOW) {
+            // rainbow fill for wave particles
+            //fill(rainbowColor(mouseX),WALPH);
+            fill(rainbowColor((float)i/LENGTH*W),WALPH);
+          }
+          else {
+            // else we're using colors from input
+            fill(colors[i],WALPH);
+          }
+          ellipse(TIME,waveLocation(TIME,i),WEIGHT,WEIGHT);
+          // second set of wave particles
+          ellipse(TIME2-25,waveLocation(TIME2,i),WEIGHT,WEIGHT);
+        }
+      }
+      else {
+        // We're displaying the wave particles and perhaps fading out the image particles
+        if (RAINBOW) {
+          // rainbow fill for image particle
+          //fill(rainbowColor(mouseX),WALPH);
+          // test, rainbow based on x location of particle
+          fill(rainbowColor((float)i/LENGTH*W),WALPH);
+        }
+        // image particle fill
+        else {
+          // else we're using colors from input
+          fill(colors[i],WALPH);
+        }
+        ellipse(TIME,waveLocation(TIME,i),WEIGHT,WEIGHT);
+        // second set of wave particles
+        ellipse(TIME2-25,waveLocation(TIME2,i),WEIGHT,WEIGHT);
+        if (PALPH > 0) {
+          if (RAINBOW) {
+            // rainbow fill for wave particles
+            //fill(rainbowColor(mouseX),PALPH);
+            fill(rainbowColor(posx),PALPH);
+          }
+          else {
+            // else we're using colors from input
+            fill(colors[i],PALPH);
+          }
+          ellipse(posx,posy,WEIGHT,WEIGHT);
+        }
+      }
+      /*if (RAINBOW) {
+        fill(rainbowColor(mouseX), ALPH);
       }
       else {
         //fill(255, ALPH);
@@ -131,27 +176,31 @@ void draw() {
       //----------------------------^
       }
       else {
+        // Normal particle arrangement
         ellipse(posx, posy, w, w);
-        println(ALPH);
-      }
+      }*/
     }
   }
   //------------------
-  if (FADE && ALPH > 0) {
-    ALPH -= 2;
+  if (!WAVE) {
+    if (PALPH < 255) {PALPH += 5;}
+    if (WALPH > 0) {WALPH -= 5;}
   }
-  else if (ALPH < 255) {
-    ALPH += 2;
+  else {
+    if (WALPH < 255) {WALPH += 5;}
+    if (PALPH > 0) {PALPH -= 5;}
   }
-  else if (ALPH > 255) {
-    ALPH = 255;
-  }
-  
   if (TIME > W) {
     TIME = 0;
   }
   else {
   TIME += 1;
+  }
+  if (TIME2 > W) {
+    TIME2 = 0;
+  }
+  else {
+  TIME2 += 1;
   }
   //-----------------^
 }
@@ -169,6 +218,15 @@ void keyPressed() {
       NTH_PARTICLE--;
     }
   }
+  
+  // change particle size
+  if (key == '[' && WEIGHT > 1) {
+    WEIGHT--;
+  }
+  if (key == ']' && WEIGHT < 20) {
+    WEIGHT++;
+  }
+   
   
   // turn trails on or off
   if (key == 't') {
@@ -197,18 +255,7 @@ void keyPressed() {
   if (key == '=' && TR_LEN < 251) {
     TR_LEN += 5;
   }
-  
-  // make things fade out
-  if (key == 'f') {
-    if (FADE) {
-      FADE = false;
-      ALPH += 2;
-    }
-    else {
-      FADE = true;
-    }
-  }
-  
+
   // turn on waves/turn off image particles
   if (key == 'w') {
     if (WAVE) {
@@ -236,45 +283,45 @@ float distance(float x1, float y1, float x2, float y2) {
 
 float waveLocation(int t, int num) {
   // uses a sin function to calculate position of particles, returns y
-  return sin((float)t/50)*noise(num)*80+((float)num/LENGTH)*H;
+  return sin((float)t/70)*noise(num)*150+((float)num/LENGTH)*H;
 }
 
 // changes the color of the particles based on mouse location, follows a rainbow pattern
-color setPartColor(float mouseX) {
+color rainbowColor(float x) {
   float r;
   float g;
   float b;
   // sector 1
-  if (mouseX < W/6) {
-    g = mouseX/(W/6) * 127;
+  if (x < W/6) {
+    g = x/(W/6) * 127;
     return color(255,g,0);
   }
   // sector 2
-  if (mouseX >= W/6 && mouseX < W/3) {
-    g = 128 + (mouseX-(W/6))/(W/6)*127;
+  if (x >= W/6 && x < W/3) {
+    g = 128 + (x-(W/6))/(W/6)*127;
     return color(255,g,0);
   }
   // sector 3
-  if (mouseX >= W/3 && mouseX < W/2) {
-    r = 255 - (mouseX-(W/3))/(W/6)*255;
+  if (x >= W/3 && x < W/2) {
+    r = 255 - (x-(W/3))/(W/6)*255;
     return color(r,255,0);
   }
   // sector 4
-  if (mouseX >= W/2 && mouseX < 2*W/3) {
-    g = 255 - (mouseX-(W/2))/(W/6)*255;
-    b = (mouseX-(W/2))/(W/6)*255;
+  if (x >= W/2 && x < 2*W/3) {
+    g = 255 - (x-(W/2))/(W/6)*255;
+    b = (x-(W/2))/(W/6)*255;
     return color(0,g,b);
   }
   // sector 5
-  if (mouseX >= 2*W/3 && mouseX < 5*W/6) {
-    r = (mouseX-(2*W/3))/(W/6)*75;
-    b = 255 - (mouseX-(2*W/3))/(W/6)*125;
+  if (x >= 2*W/3 && x < 5*W/6) {
+    r = (x-(2*W/3))/(W/6)*75;
+    b = 255 - (x-(2*W/3))/(W/6)*125;
     return color(r,0,b);
   }
   // else we must be in sector 6
   else {
-    r = 75 + (mouseX-(5*W/6))/(W/6)*68;
-    b = 130 + (mouseX-(5*W/6))/(W/6)*125;
+    r = 75 + (x-(5*W/6))/(W/6)*68;
+    b = 130 + (x-(5*W/6))/(W/6)*125;
     return color(r,0,b);
   }
 }
@@ -284,7 +331,13 @@ int[] readInput(String[] input) {
   int[] res = new int[2];
   // Convert coordinates from String to Float
   for(int i=1; i<LENGTH; i++) {
+    //------------------------------------------
+    input[i] = input[i].replace("(","");
+    input[i] = input[i].replace(")","");
+    input[i] = input[i].replace(",","");
     temp = input[i].split(" ");
+    colors[i] = color(Integer.parseInt(temp[2]),Integer.parseInt(temp[3]),Integer.parseInt(temp[4]));
+    //-----------------------------------------^
     locations[0][i-1] = Float.parseFloat(temp[0]);
     locations[1][i-1] = Float.parseFloat(temp[1]);
   }

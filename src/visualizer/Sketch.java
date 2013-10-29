@@ -52,6 +52,7 @@ public class Sketch extends PApplet {
 
 	boolean FADEOUT = false;
 	boolean FADEIN = false;
+
 	int PALPH = 255;
 	int WALPH = 0;
 	int TIME, TIME2;
@@ -271,6 +272,7 @@ public class Sketch extends PApplet {
 				fTime = System.nanoTime();
 			}
 		}
+
 		
 		// ---------------Not working!--------------------------
 		if (FADEOUT) {
@@ -287,6 +289,7 @@ public class Sketch extends PApplet {
 			}
 		}
 		//-----------------------------------------------------
+
 	}
 
 	public void keyPressed() {
@@ -376,7 +379,7 @@ public class Sketch extends PApplet {
 				// println("Saved.");
 			}
 		}
-		
+
 		if (key == '1'){
 			FADEOUT = true;
 			setImage("0");
@@ -405,6 +408,7 @@ public class Sketch extends PApplet {
 			FADEOUT = true;
 			setImage("6");
 		}	
+
 		// turn the springs on or off, if springs are off the particles will bounce off the walls
 		if (key == 'p') {
 			if (SPRNG) {

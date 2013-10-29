@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="libraries/thumbnailator-0.4.6.jar"/>
 	<classpathentry kind="lib" path="libraries/WiiRemoteJ.jar"/>
 	<classpathentry kind="lib" path="libraries/xuggle-xuggler-5.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Isaac Hernandez/Documents/GitHub/ProcessingVisualizer/libraries/slf4j-api.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

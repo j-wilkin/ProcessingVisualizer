@@ -2,17 +2,7 @@ package visualizer;
 
 import java.awt.Color;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.concurrent.TimeUnit;
-
-import com.xuggle.mediatool.IMediaWriter;
-import com.xuggle.mediatool.ToolFactory;
-import com.xuggle.xuggler.IRational;
-import com.xuggle.xuggler.IStreamCoder;
 
 import processing.core.*;
 import traer.physics.*;
@@ -20,21 +10,14 @@ import traer.physics.*;
 public class Sketch extends PApplet {
 
 	// Recording variables
-	// IMediaWriter, from Xuggler
-	IMediaWriter imw;
-	// IStreamCoder, from Xuggler
-	IStreamCoder isc;
-	BufferedImage bgr;
 	Image img;
-	// File f;
-	PImage p;
-	int vidRate = 30;
+	double vidRate = 30;
 	int frames = 0;
-	long sTime;
+	long[] timeStamps;
 	long fTime;
-
+	long sTime;
+	//String stri;    // for debugging
 	boolean recording;
-	boolean recordingDone = false;
 
 	// Sketch variables
 
@@ -117,6 +100,9 @@ public class Sketch extends PApplet {
 	}
 	
 	public void setup() {
+		// set up an array to hold the time stamps for each frame
+		timeStamps = new long[100000];
+		
 		// GRABS THE LOCATIONS OF PARTICLES FROM THE EDGE-DETECTED PICTURE
 		setImage("0");
 		frameRate(30);
@@ -259,20 +245,22 @@ public class Sketch extends PApplet {
 		}
 
 		if (recording) {
-			// the IMediaWriter should be open from avRecorderSetup(), which is
-			// called when 'r' is pressed
-			// set cTime
-			// (not sure what cTime does, or if this if statement is necessary,
-			// havent removed to check)
-			long cTime = System.nanoTime() - fTime;
-			if (cTime >= (double) 1000 / vidRate) {
-				// save image to file
-				save("pics/img" + frames + ".jpg");
-				frames++;
-				fTime = System.nanoTime();
-			}
-		}
-
+	        // set up current time
+			long cTime = System.nanoTime()-fTime;
+	        
+	        // for debugging
+	        //stri = String.valueOf(frames);
+	        //text(stri,10,10);
+	        
+	        if (cTime >= (double)1000/vidRate) { 
+	        	// save image to file
+	            save("pics/img"+frames+".jpg");
+	            // store time stamp of each frame
+	            timeStamps[frames] = System.nanoTime();
+	            frames++;
+	        }
+	        fTime = System.nanoTime();
+	  }
 		
 		// ---------------Not working!--------------------------
 		if (FADEOUT) {
@@ -357,28 +345,28 @@ public class Sketch extends PApplet {
 				MOUSE = true;
 			}
 		}
-
+		
+		// press 'r' to start/stop recording
 		if (key == 'r') {
-			if (!recording) {
-				// Begin the recording process
-				// println("Recording...");
-				recording = true;
-				boolean success = (new File("pics")).mkdir();
-				frames = 0;
-			} else
-				recording = false;
-			recordingDone = true;
-		}
-		// if 's' key is pressed while recording...
+		     if(!recording){
+		        recording = true;
+		        boolean success = (new File("pics")).mkdir();
+		        frames = 0;
+		        sTime = fTime = System.nanoTime();
+		     }
+		     else{
+		    	recording = false;
+		     }
+		  }
+		// press 's' to export
 		if (key == 's') {
-			if (recordingDone == true) {
-				// stop the recording process and save the recording
-				// println("Saving...");
-				recording = false;
-				encodeVideo();
-				// println("Saved.");
-			}
+		     if(recording)
+		        recording = false;
+		     for(int i=0; i<11; i++){
+		    	 new encodeVideo(frames, vidRate, sTime, timeStamps);
+		     }
 		}
+
 
 		if (key == '1'){
 			FADEOUT = true;
@@ -498,40 +486,5 @@ public class Sketch extends PApplet {
 		res[0] = Integer.parseInt(temp[0]);
 		res[1] = Integer.parseInt(temp[1]);
 		return res;
-	}
-
-	void encodeVideo() {
-		imw = ToolFactory.makeWriter(sketchPath("processingSketch.mp4"));
-		imw.open();
-		imw.setForceInterleave(true);
-		imw.addVideoStream(0, 0, IRational.make((double) vidRate), width,
-				height);
-		isc = imw.getContainer().getStream(0).getStreamCoder();
-		bgr = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-		sTime = fTime = System.nanoTime();
-
-		for (int i = 0; i < frames; i++) {
-			// p = loadImage("../pics/img"+i+".jpg");
-			// img = p.getImage();
-			URL spotU = null;
-			try {
-				spotU = new URL("pics/img" + i + ".jpg");
-			} catch (MalformedURLException e1) {
-				e1.printStackTrace();
-			}
-			img = getImage(spotU);
-
-			bgr.getGraphics().drawImage(img, 0, 0, new ImageObserver() {
-				public boolean imageUpdate(Image i, int a, int b, int c, int d,
-						int e) {
-					return true;
-				}
-			});
-			imw.encodeVideo(0, bgr, System.nanoTime() - sTime,
-					TimeUnit.NANOSECONDS);
-		}
-
-		imw.flush();
-		imw.close();
 	}
 }

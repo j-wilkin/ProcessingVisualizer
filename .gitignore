@@ -1,0 +1,3 @@
+# ignore video output files
+pics/
+*.H264

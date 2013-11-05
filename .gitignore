@@ -1,3 +1,4 @@
 # ignore video output files
 pics/
 *.H264
+.metadata

@@ -15,8 +15,6 @@ public class Sketch extends PApplet {
 	int frames = 0;
 	long[] timeStamps;
 	long fTime;
-	long sTime;
-	//String stri;    // for debugging
 	boolean recording;
 
 	// Sketch variables
@@ -32,18 +30,18 @@ public class Sketch extends PApplet {
 	boolean TRAIL = true;
 	int TR_LEN = 90;
 	boolean RAINBOW = false;
-
+	
 	boolean FADEOUT = false;
 	boolean FADEIN = false;
 	String NEXTIMG;
 
-	int PALPH = 255;
-	int WALPH = 0;
-	int TIME, TIME2;
-	boolean WAVE = false;
-	boolean MOUSE = false;
-	boolean SPRNG = true;
-	float WEIGHT = 5;
+    int PALPH = 255;
+    int WALPH = 0;
+    int TIME, TIME2;
+    boolean WAVE = false;
+    boolean MOUSE = false;
+    boolean SPRNG = true;
+    float WEIGHT = 5;
 
 	Particle mouse; // particle on mouse position
 	Particle[] particles; // the moving particle
@@ -283,6 +281,7 @@ public class Sketch extends PApplet {
 	}
 
 	public void keyPressed() {
+
 		// If the user presses up on the keyboard, fewer particles will be drawn
 		// and vice versa
 		if (key == CODED) {
@@ -349,25 +348,25 @@ public class Sketch extends PApplet {
 		}
 		
 		// press 'r' to start/stop recording
-		if (key == 'r') {
-		     if(!recording){
-		        recording = true;
-		        boolean success = (new File("pics")).mkdir();
-		        frames = 0;
-		        sTime = fTime = System.nanoTime();
-		     }
-		     else{
-		    	recording = false;
-		     }
-		  }
-		// press 's' to export
-		if (key == 's') {
-		     if(recording)
-		        recording = false;
-		     for(int i=0; i<11; i++){
-		    	 new encodeVideo(frames, vidRate, sTime, timeStamps);
-		     }
-		}
+//		if (key == 'r') {
+//		     if(!recording){
+//		        recording = true;
+//		        boolean success = (new File("pics")).mkdir();
+//		        frames = 0;
+//		        sTime = fTime = System.nanoTime();
+//		     }
+//		     else{
+//		    	recording = false;
+//		     }
+//		  }
+//		// press 's' to export
+//		if (key == 's') {
+//		     if(recording)
+//		        recording = false;
+//		     for(int i=0; i<11; i++){
+//		    	 new encodeVideo(frames, vidRate, sTime, timeStamps);
+//		     }
+//		}
 
 
 		if (key == '1'){
@@ -421,6 +420,7 @@ public class Sketch extends PApplet {
 			    }
 			}
 		}
+
 
 	}
 

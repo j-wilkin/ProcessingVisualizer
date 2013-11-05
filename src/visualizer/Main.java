@@ -1,11 +1,15 @@
 package visualizer;
 
+import java.awt.List;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+
 import javax.imageio.ImageIO;
+
 import net.coobird.thumbnailator.Thumbnails;
 
 public class Main {
@@ -23,28 +27,12 @@ public class Main {
 		
 	}
 	
-	public static void main(String[] args) throws IOException {
-	        
-	    	procImage("input/pic0.jpg", "0");
-	    	procImage("input/pic1.jpg", "1");
-	    	procImage("input/pic2.jpg", "2");
-	    	procImage("input/pic3.jpg", "3");
-	    	procImage("input/pic4.jpg", "4");
-	    	procImage("input/pic5.jpg", "5");
-	    	procImage("input/pic6.jpg", "6");
-	    	new DisplayFrame().setVisible(true);
-	    	
-	    	
-    
-	}
-	
-	public static void procImage(String filename, String nameExt) throws IOException {
-		
+	public static void loadProcessing(String filename, String nameExt) throws IOException {
 		BufferedImage image = ImageIO.read( new File( filename ) );
-    	visualizer.CannyEdgeDetector detector = new visualizer.CannyEdgeDetector();
-    	detector.setSourceImage(image);
-    	detector.process();
-    	BufferedImage edges = detector.getEdgesImage();
+		visualizer.CannyEdgeDetector detector = new visualizer.CannyEdgeDetector();
+		detector.setSourceImage(image);
+		detector.process();
+		BufferedImage edges = detector.getEdgesImage();
     	
     	int startW = edges.getWidth();
     	int startH = edges.getHeight();
@@ -61,6 +49,7 @@ public class Main {
     	PrintStream out = new PrintStream(new FileOutputStream("particles" + nameExt + ".txt"));
     	System.setOut(out);
     	out.println(newW + " " + newH);
+    	
     	for( int i = 0; i < thumb.getWidth(); i++ )
     	    for( int j = 0; j < thumb.getHeight(); j++ ){
     	    	int pix = thumb.getRGB( i, j );
@@ -74,7 +63,23 @@ public class Main {
     	        }
     	    }
     	out.close();
-		
+    	
+    	//new DisplayFrame().setVisible(true);
 	}
 	
+	public static void main(String[] args) {
+		//Open a file
+		
+		UploadGUI intro = new UploadGUI();
+		
+		//CheatSheet box = new CheatSheet();
+		//box.setVisible(true);
+		
+		// Ask for input - how many files would user like to upload? Give a range
+		
+		//new FileUploadTest();
+		//for (int i = 0; i < numImages; i++) {
+		//	new FileUploadTest(i);
+		//}	
+	}
 }

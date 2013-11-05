@@ -28,6 +28,7 @@ public class Sketch extends PApplet {
 	int vidRate = 30;
 	long sTime;
 	long fTime;
+	long[] timeStamps;
 
 	boolean recording;
 	
@@ -44,54 +45,79 @@ public class Sketch extends PApplet {
 	boolean TRAIL = true;
 	int TR_LEN = 90;
 	boolean RAINBOW = false;
+	
+	boolean FADEOUT = false;
+    boolean FADEIN = false;
+
+    int PALPH = 255;
+    int WALPH = 0;
+    int TIME, TIME2;
+    boolean WAVE = false;
+    boolean MOUSE = false;
+    boolean SPRNG = true;
+    float WEIGHT = 5;
 
 	Particle mouse;            // particle on mouse position
 	Particle[] particles;      // the moving particle
 	Particle[] orgParticles;   // original particles - fixed
-	Color[] Colors;            // Color values from the image
+	Spring[] springs;
+	int[][] Colors;            // Color values from the image
 	ParticleSystem physics;    // the particle system
 	float[][] locations; // 2d array of particle locations
 	String[] input;
 	int LENGTH;
+	
+	public void setImage(String extName){                
+        int[] res;
+        input = loadStrings("particles" + extName + ".txt");
+        LENGTH = input.length;
+        locations = new float[2][LENGTH];
+        Colors = new int[LENGTH][3];
+        res = readInput(input);
+        W = res[0];
+        H = res[1];
+        TIME = 0;
+        TIME2 = W / 2;
+        
+        // Particle System + Detect Colors
+        physics = new ParticleSystem(0, 0.05f);
+        physics.setIntegrator(ParticleSystem.MODIFIED_EULER);
+        mouse = physics.makeParticle(); // create a particle for the mouse
+        mouse.makeFixed(); // don't let forces move it
+        particles = new Particle[LENGTH];
+        orgParticles = new Particle[LENGTH];
+        springs = new Spring[LENGTH];
+
+        // Makes the visible and anchor particles
+        for (int i = 0; i < LENGTH; i++) {
+                particles[i] = physics.makeParticle(random(MIN_MASS, MAX_MASS),
+                                locations[0][i], locations[1][i], 0);
+                orgParticles[i] = physics.makeParticle(random(MIN_MASS, MAX_MASS),
+                                locations[0][i], locations[1][i], 0);
+                orgParticles[i].makeFixed();
+                // make the moving particles go to their former positions (creates
+                // the springs)
+                springs[i] = physics.makeSpring(particles[i], orgParticles[i], 0.007f, 0.1f, 0);
+                // make the moving particles get away from the mouse
+                physics.makeAttraction(particles[i], mouse, -5000, 0.1f);
+        }
+        
+        fill(0, 255);
+        rect(0, 0, W, H);
+        // Processing Setup
+        size(W, H);
+        noStroke();
+        ellipseMode(CENTER);
+        smooth();
+}
 	 
 	public void setup() {
-	  // GRABS THE LOCATIONS OF PARTICLES FROM THE EDGE-DETECTED PICTURE  
-	  int[] res;
-	  input = loadStrings("particles.txt");
-	  //input = loadStrings("particlesRacecarNew.txt");
-	  LENGTH = input.length;
-	  locations = new float[2][LENGTH];
-	  res = readInput(input);  
-	  W = res[0];
-	  H = res[1];
-	   
-	  // Processing Setup
-	  size(W, H); 
-	  fill(0, 255);
-	  rect(0, 0, W, H);
-	  noStroke();
-	  ellipseMode(CENTER);
-	  smooth();
-	 
-	  // Particle System + Detect Colors
-	  physics = new ParticleSystem(0, 0.05f);
-	  mouse = physics.makeParticle();            // create a particle for the mouse
-	  mouse.makeFixed();                         // don't let forces move it
-	  particles = new Particle[LENGTH];
-	  orgParticles = new Particle[LENGTH];
-	  Colors = new Color[LENGTH];
-	  
-	  // Makes the visible and anchor particles
-	  for(int i=0; i<LENGTH; i++) {
-	    particles[i] = physics.makeParticle(random(MIN_MASS, MAX_MASS), locations[0][i], locations[1][i], 0);
-	    orgParticles[i] = physics.makeParticle(random(MIN_MASS, MAX_MASS), locations[0][i], locations[1][i], 0);
-	    orgParticles[i].makeFixed();
-	    // make the moving particles go to their former positions (creates the springs)
-	    physics.makeSpring(particles[i], orgParticles[i], 0.007f, 0.1f, 0);
-	    // make the moving particles get away from the mouse
-	    physics.makeAttraction(particles[i], mouse, -5000, 0.1f);
-	  }
-	  frameRate(30);
+		// set up an array to hold the time stamps for each frame
+        timeStamps = new long[100000];
+        
+        // GRABS THE LOCATIONS OF PARTICLES FROM THE EDGE-DETECTED PICTURE
+        setImage("0");
+        frameRate(30);
 	}
 	 
 	//@SuppressWarnings("deprecation")
@@ -206,6 +232,14 @@ public class Sketch extends PApplet {
 	    TR_LEN += 5;
 	  }
 	  
+	  if (key == '1'){
+          FADEOUT = true;
+          setImage("0");
+	  }
+	  if (key == '2'){
+          FADEOUT = true;
+          setImage("1");
+	  }                
 // Video recording keys	  
 //	  // if 'r' key is pressed while not recording...
 //	  if (key == 'r') {

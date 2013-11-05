@@ -1,5 +1,7 @@
 package visualizer;
 
+import java.util.ArrayList;
+
 public class DisplayFrame extends javax.swing.JFrame {
     public DisplayFrame(){
         this.setSize(800, 800); //The window Dimensions

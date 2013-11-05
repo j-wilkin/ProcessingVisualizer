@@ -35,6 +35,7 @@ public class Sketch extends PApplet {
 
 	boolean FADEOUT = false;
 	boolean FADEIN = false;
+	String NEXTIMG;
 
 	int PALPH = 255;
 	int WALPH = 0;
@@ -263,19 +264,20 @@ public class Sketch extends PApplet {
 	  }
 		
 		// ---------------Not working!--------------------------
-		if (FADEOUT) {
-			PALPH -= 5;
-			if (PALPH == 0) {
-				FADEOUT = false;
-				FADEIN = true;
-			}
-		}
-		if (FADEIN){
-			PALPH += 5;
-			if (PALPH == 255) {
-				FADEIN = false;
-			}
-		}
+//		if (FADEOUT) {
+//			PALPH -= 5;
+//			if (PALPH == 0) {
+//				FADEOUT = false;
+//				setImage(NEXTIMG);
+//				FADEIN = true;
+//			}
+//		}
+//		if (FADEIN){
+//			PALPH += 5;
+//			if (PALPH == 255) {
+//				FADEIN = false;
+//			}
+//		}
 		//-----------------------------------------------------
 
 	}
@@ -370,31 +372,38 @@ public class Sketch extends PApplet {
 
 		if (key == '1'){
 			FADEOUT = true;
-			setImage("0");
+			NEXTIMG = "0";
+			setImage(NEXTIMG);
 		}
 		if (key == '2'){
 			FADEOUT = true;
-			setImage("1");
+			NEXTIMG = "1";
+			setImage(NEXTIMG);
 		}		
 		if (key == '3'){
 			FADEOUT = true;
-			setImage("2");
+			NEXTIMG = "2";
+			setImage(NEXTIMG);
 		}
 		if (key == '4'){
 			FADEOUT = true;
-			setImage("3");
+			NEXTIMG = "3";
+			setImage(NEXTIMG);
 		}	
 		if (key == '5'){
 			FADEOUT = true;
-			setImage("4");
+			NEXTIMG = "4";
+			setImage(NEXTIMG);
 		}
 		if (key == '6'){
 			FADEOUT = true;
-			setImage("5");
+			NEXTIMG = "5";
+			setImage(NEXTIMG);
 		}	
 		if (key == '7'){
 			FADEOUT = true;
-			setImage("6");
+			NEXTIMG = "6";
+			setImage(NEXTIMG);
 		}	
 
 		// turn the springs on or off, if springs are off the particles will bounce off the walls

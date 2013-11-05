@@ -34,6 +34,7 @@ public class Main {
 	    	procImage("input/pic6.jpg", "6");
 	    	new DisplayFrame().setVisible(true);
 	    	
+	    	
     
 	}
 	

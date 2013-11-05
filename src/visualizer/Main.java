@@ -29,10 +29,10 @@ public class Main {
 	
 	public static void loadProcessing(String filename, String nameExt) throws IOException {
 		BufferedImage image = ImageIO.read( new File( filename ) );
-    	visualizer.CannyEdgeDetector detector = new visualizer.CannyEdgeDetector();
-    	detector.setSourceImage(image);
-    	detector.process();
-    	BufferedImage edges = detector.getEdgesImage();
+		visualizer.CannyEdgeDetector detector = new visualizer.CannyEdgeDetector();
+		detector.setSourceImage(image);
+		detector.process();
+		BufferedImage edges = detector.getEdgesImage();
     	
     	int startW = edges.getWidth();
     	int startH = edges.getHeight();

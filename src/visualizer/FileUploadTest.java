@@ -45,7 +45,7 @@ public class FileUploadTest extends Frame implements ActionListener
 	{
 		try
 		{
-			Main.loadProcessing(fname);
+			Main.loadProcessing(fname, "0");
 			//Main.loadProcessing(fname, numImage);
 		}
 		catch(IOException e)

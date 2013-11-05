@@ -38,8 +38,6 @@ public class UploadGUI implements ActionListener {
     }
     
     public void fileUpload() {
-    	//new FileUploadTest();
-    	System.out.println("working...?");
     	
     	JFileChooser chooser = new JFileChooser();
     	chooser.setMultiSelectionEnabled(true);
@@ -52,7 +50,7 @@ public class UploadGUI implements ActionListener {
 		{
 			// for loop for loadProcessing
 			for (int i = 0; i < numFiles; i++) {
-				Main.loadProcessing(files[i].getName(), Integer.toString(i));
+				Main.loadProcessing("input/" + files[i].getName(), Integer.toString(i));
 			}
 			//Main.loadProcessing(fname, numImage);
 			new DisplayFrame().setVisible(true);

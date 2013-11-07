@@ -43,11 +43,12 @@ public class Sketch extends PApplet {
     boolean SPRNG = true;
     float WEIGHT = 5;
     
-	float WSTRENGTH = 1000;
+	float WSTRENGTH = 5000;
 	
 	boolean TTEMP = true;
 	
-	Particle waveParticle;
+	Particle attrParticle;
+	Attraction[] attractions1;
 
 	Particle mouse; // particle on mouse position
 	Particle[] particles; // the moving particle
@@ -77,11 +78,12 @@ public class Sketch extends PApplet {
 		physics.setIntegrator(ParticleSystem.MODIFIED_EULER);
 		mouse = physics.makeParticle(); // create a particle for the mouse
 		mouse.makeFixed(); // don't let forces move it
-		waveParticle = physics.makeParticle(random(MIN_MASS, MAX_MASS), 0, H/2f, 0);
-		waveParticle.makeFixed();
+		attrParticle = physics.makeParticle(random(MIN_MASS, MAX_MASS), 0, H/2f, 0);
+		attrParticle.makeFixed();
 		particles = new Particle[LENGTH];
 		orgParticles = new Particle[LENGTH];
 		springs = new Spring[LENGTH];
+		attractions1 = new Attraction[LENGTH];
 
 		// Makes the visible and anchor particles
 		for (int i = 0; i < LENGTH; i++) {
@@ -94,8 +96,8 @@ public class Sketch extends PApplet {
 			// the springs)
 			springs[i] = physics.makeSpring(particles[i], orgParticles[i], 0.007f, 0.1f, 0);
 			// make the moving particles get away from the mouse
-			//physics.makeAttraction(particles[i], mouse, -5000f, 0.1f);
-			physics.makeAttraction(particles[i], waveParticle, WSTRENGTH, 0.1f);
+			physics.makeAttraction(particles[i], mouse, -5000f, 0.1f);
+			attractions1[i] = physics.makeAttraction(particles[i], attrParticle, WSTRENGTH, 0.1f);
 		}
 		fill(0, 255);
 		rect(0, 0, W, H);
@@ -152,7 +154,7 @@ public class Sketch extends PApplet {
 					if (TTEMP) {
 						ellipse(TIME, temp, WEIGHT, WEIGHT);
 					}
-					waveParticle.position().set(TIME, temp, 0);
+					attrParticle.position().set(TIME, temp, 0);
 				}
 				if (!SPRNG) {
 					// particles are bouncing around without springs

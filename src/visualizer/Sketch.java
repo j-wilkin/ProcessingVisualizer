@@ -61,8 +61,8 @@ public class Sketch extends PApplet {
 		locations = new float[2][LENGTH];
 		Colors = new int[LENGTH][3];
 		res = readInput(input);
-		W = res[0];
-		H = res[1];
+		W = 1000; //res[0];
+		H = 720; //res[1];
 		TIME = 0;
 		TIME2 = W / 2;
 		
@@ -88,7 +88,6 @@ public class Sketch extends PApplet {
 			// make the moving particles get away from the mouse
 			physics.makeAttraction(particles[i], mouse, -5000, 0.1f);
 		}
-		
 		fill(0, 255);
 		rect(0, 0, W, H);
 		// Processing Setup
@@ -105,6 +104,8 @@ public class Sketch extends PApplet {
 		// GRABS THE LOCATIONS OF PARTICLES FROM THE EDGE-DETECTED PICTURE
 		setImage("0");
 		frameRate(30);
+		
+
 	}
 
 	// @SuppressWarnings("deprecation")
@@ -217,19 +218,21 @@ public class Sketch extends PApplet {
 				}
 			}
 		}
-		if (!WAVE) {
-			if (PALPH < 255) {
-				PALPH += 5;
-			}
-			if (WALPH > 0) {
-				WALPH -= 5;
-			}
-		} else {
-			if (WALPH < 255) {
-				WALPH += 5;
-			}
-			if (PALPH > 0) {
-				PALPH -= 5;
+		if (!FADEOUT && !FADEIN){
+			if (!WAVE) {
+				if (PALPH < 255) {
+					PALPH += 5;
+				}
+				if (WALPH > 0) {
+					WALPH -= 5;
+				}
+			} else {
+				if (WALPH < 255) {
+					WALPH += 5;
+				}
+				if (PALPH > 0) {
+					PALPH -= 5;
+				}
 			}
 		}
 		if (TIME > W) {
@@ -259,25 +262,24 @@ public class Sketch extends PApplet {
 	            frames++;
 	        }
 	        fTime = System.nanoTime();
-	  }
+		}
 		
-		// ---------------Not working!--------------------------
-//		if (FADEOUT) {
-//			PALPH -= 5;
-//			if (PALPH == 0) {
-//				FADEOUT = false;
-//				setImage(NEXTIMG);
-//				FADEIN = true;
-//			}
-//		}
-//		if (FADEIN){
-//			PALPH += 5;
-//			if (PALPH == 255) {
-//				FADEIN = false;
-//			}
-//		}
-		//-----------------------------------------------------
-
+		if (FADEOUT) {
+			FADEIN = false;
+			PALPH -= 5;
+			if (PALPH == 0) {
+				FADEOUT = false;
+				setImage(NEXTIMG);
+				FADEIN = true;
+			}
+		}
+		if (FADEIN){
+			FADEOUT = false;
+			PALPH += 5;
+			if (PALPH == 255) {
+				FADEIN = false;
+			}
+		}
 	}
 
 	public void keyPressed() {
@@ -372,37 +374,37 @@ public class Sketch extends PApplet {
 		if (key == '1'){
 			FADEOUT = true;
 			NEXTIMG = "0";
-			setImage(NEXTIMG);
+			//setImage(NEXTIMG);
 		}
 		if (key == '2'){
 			FADEOUT = true;
 			NEXTIMG = "1";
-			setImage(NEXTIMG);
+			//setImage(NEXTIMG);
 		}		
 		if (key == '3'){
 			FADEOUT = true;
 			NEXTIMG = "2";
-			setImage(NEXTIMG);
+			//setImage(NEXTIMG);
 		}
 		if (key == '4'){
 			FADEOUT = true;
 			NEXTIMG = "3";
-			setImage(NEXTIMG);
+			//setImage(NEXTIMG);
 		}	
 		if (key == '5'){
 			FADEOUT = true;
 			NEXTIMG = "4";
-			setImage(NEXTIMG);
+			//setImage(NEXTIMG);
 		}
 		if (key == '6'){
 			FADEOUT = true;
 			NEXTIMG = "5";
-			setImage(NEXTIMG);
+			//setImage(NEXTIMG);
 		}	
 		if (key == '7'){
 			FADEOUT = true;
 			NEXTIMG = "6";
-			setImage(NEXTIMG);
+			//setImage(NEXTIMG);
 		}	
 
 		// turn the springs on or off, if springs are off the particles will bounce off the walls

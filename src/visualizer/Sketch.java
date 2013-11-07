@@ -42,6 +42,12 @@ public class Sketch extends PApplet {
     boolean MOUSE = false;
     boolean SPRNG = true;
     float WEIGHT = 5;
+    
+	float WSTRENGTH = 1000;
+	
+	boolean TTEMP = true;
+	
+	Particle waveParticle;
 
 	Particle mouse; // particle on mouse position
 	Particle[] particles; // the moving particle
@@ -71,6 +77,8 @@ public class Sketch extends PApplet {
 		physics.setIntegrator(ParticleSystem.MODIFIED_EULER);
 		mouse = physics.makeParticle(); // create a particle for the mouse
 		mouse.makeFixed(); // don't let forces move it
+		waveParticle = physics.makeParticle(random(MIN_MASS, MAX_MASS), 0, H/2f, 0);
+		waveParticle.makeFixed();
 		particles = new Particle[LENGTH];
 		orgParticles = new Particle[LENGTH];
 		springs = new Spring[LENGTH];
@@ -86,7 +94,8 @@ public class Sketch extends PApplet {
 			// the springs)
 			springs[i] = physics.makeSpring(particles[i], orgParticles[i], 0.007f, 0.1f, 0);
 			// make the moving particles get away from the mouse
-			physics.makeAttraction(particles[i], mouse, -5000, 0.1f);
+			//physics.makeAttraction(particles[i], mouse, -5000f, 0.1f);
+			physics.makeAttraction(particles[i], waveParticle, WSTRENGTH, 0.1f);
 		}
 		fill(0, 255);
 		rect(0, 0, W, H);
@@ -110,6 +119,7 @@ public class Sketch extends PApplet {
 
 	// @SuppressWarnings("deprecation")
 	public void draw() {
+		float temp;
 		// background(0);
 		// Causes particle trails
 		noStroke();
@@ -135,6 +145,15 @@ public class Sketch extends PApplet {
 						/ (distance(0f, 0f, (float) W, (float) H)) * 255);
 			}
 			if (i % NTH_PARTICLE == 0) {
+				if (WSTRENGTH != 0) {
+					// display the interactive wave particle
+					temp = waveLocation(TIME, LENGTH/2);
+					fill(255, 255, 255, 255);
+					if (TTEMP) {
+						ellipse(TIME, temp, WEIGHT, WEIGHT);
+					}
+					waveParticle.position().set(TIME, temp, 0);
+				}
 				if (!SPRNG) {
 					// particles are bouncing around without springs
 					if (posx < 0) {
@@ -295,6 +314,16 @@ public class Sketch extends PApplet {
 				NTH_PARTICLE--;
 			}
 		}
+		
+		// temporary, to turn on the repelling particle visual
+		if (key == 'z') {
+			if (TTEMP) {
+				TTEMP = false;
+			}
+			else {
+				TTEMP = true;
+			}
+		}
 
 		// change particle size
 		if (key == '[' && WEIGHT > 1) {
@@ -312,7 +341,7 @@ public class Sketch extends PApplet {
 				TRAIL = true;
 			}
 		}
-
+		
 		// turn rainbow mode on or off
 		if (key == '/') {
 			if (RAINBOW) {

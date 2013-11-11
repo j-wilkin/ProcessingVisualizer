@@ -3,9 +3,11 @@ package visualizer;
 import java.awt.Color;
 import java.awt.Image;
 import java.io.File;
+import java.nio.ByteBuffer;
 
 import processing.core.*;
 import traer.physics.*;
+import themidibus.*;
 
 public class Sketch extends PApplet {
 
@@ -40,7 +42,7 @@ public class Sketch extends PApplet {
     int WALPH = 0;
     int TIME, TIME2;
     boolean WAVE = false;
-    boolean MOUSE = false;
+    boolean MOUSE = true;
     boolean SPRNG = true;
     float WEIGHT = 5;
     
@@ -65,7 +67,70 @@ public class Sketch extends PApplet {
 	int LENGTH;
 
 	
-	public void setImage(String extName){		
+	public void controllerChange(int channel, int number, int value){
+		println("Channel: " + channel);
+		println("Number: "+number);
+		println("Value: "+value);
+		
+		// Sliders
+		if (channel == 0)
+			switch (number) {
+				case 1: NTH_PARTICLE = value;
+					break;
+				case 2: WEIGHT = value;
+					break;
+				case 3: TR_LEN = value*5;
+					break;
+			}
+			
+		// Toggles
+		else if (channel == 1 && value == 1)
+			switch (number) {
+				case 10: TRAIL = !TRAIL;
+					break;
+				case 12: RAINBOW = !RAINBOW;
+					break;
+				case 11: if (SPRNG) {
+							SPRNG = false;
+						    for (int i=0; i<LENGTH; i++) {
+						    	springs[i].turnOff();
+						    }
+						}
+						else {
+							SPRNG = true;
+							for (int i=0; i<LENGTH; i++) {
+						    	springs[i].turnOn();
+						    }
+						}
+					break;
+				case 13: WAVE = !WAVE;
+					break;
+				//case 14: MOUSE = !MOUSE;
+			}
+		
+		// Image Select
+		else if (channel == 2 && value == 1)
+			switch (number) {
+				case 100: transitionImg("0");
+					break;
+				case 101: transitionImg("1");
+					break;
+				case 102: transitionImg("2");
+					break;
+				case 103: transitionImg("3");
+					break;
+				case 104: transitionImg("4");
+					break;
+				case 105: transitionImg("5");
+					break;
+				case 106: transitionImg("6");
+					break;
+			}
+		 
+	}
+	
+	public void setImage(String extName){	
+
 		int[] res;
 		int temp, temp2;
 		input = loadStrings("particles" + extName + ".txt");
@@ -73,7 +138,7 @@ public class Sketch extends PApplet {
 		locations = new float[2][LENGTH];
 		Colors = new int[LENGTH][3];
 		res = readInput(input);
-		W = 1000; //res[0];
+		W = 1080; //res[0];
 		H = 720; //res[1];
 		TIME = 0;
 		TIME2 = W / 2;
@@ -139,16 +204,24 @@ public class Sketch extends PApplet {
 		smooth();
 	}
 	
+	public void transitionImg(String extension){
+		FADEOUT = true;
+		NEXTIMG = extension;
+	}
+	
 	public void setup() {
 		// set up an array to hold the time stamps for each frame
 		timeStamps = new long[100000];
 			
 		// GRABS THE LOCATIONS OF PARTICLES FROM THE EDGE-DETECTED PICTURE
 		setImage("0");
-		//frameRate(30);
+		frameRate(30);
+		MidiBus.list();
+		MidiBus myBus = new MidiBus(this, 0, 0);
 		
-
 	}
+	
+	
 
 	// @SuppressWarnings("deprecation")
 	public void draw() {
@@ -162,8 +235,8 @@ public class Sketch extends PApplet {
 		}
 		rect(0, 0, W, H);
 
-		println("framerate: " + frameRate);
-		println("NTH_PARTICLE: " + NTH_PARTICLE);
+		//println("framerate: " + frameRate);
+		//println("NTH_PARTICLE: " + NTH_PARTICLE);
 
 		mouse.position().set(mouseX, mouseY, 0);
 		PARTICLE_COLOR = rainbowColor(mouseX);
@@ -203,10 +276,10 @@ public class Sketch extends PApplet {
 		for (int i = 0; i < LENGTH; i++) {
 			posx = particles[i].position().x();
 			posy = particles[i].position().y();
-			if (!WAVE && MOUSE) {
-				PALPH = (int) ((distance(posx, mouseX, posy, mouseY))
-						/ (distance(0f, 0f, (float) W, (float) H)) * 255);
-			}
+//			if (!WAVE && MOUSE) {
+//				PALPH = (int) ((distance(posx, mouseX, posy, mouseY))
+//						/ (distance(0f, 0f, (float) W, (float) H)) * 255);
+//			}
 			if (i % NTH_PARTICLE == 0) {
 				if (!SPRNG) {
 					// particles are bouncing around without springs

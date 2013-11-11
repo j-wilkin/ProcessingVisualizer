@@ -50,9 +50,8 @@ public class Sketch extends PApplet {
 	
 	Particle[] attrParticles;
 	int attrPartNum = 4;
-    boolean ATTR = true;
+    boolean ATTR = false;
 	float[][] ATTRV;
-	// NEED TO THINK ABOUT HOW TO SAVE THESE. getCustomForce() after making it?
 	Force[] myAttractions;
 	Force[] attrForces;
 
@@ -188,7 +187,6 @@ public class Sketch extends PApplet {
 			physics.makeAttraction(particles[i], mouse, -5000f, 0.1f);
 			// make the forces between the force particles and the springy particles
 			for (int j = 0; j < attrPartNum; j++) {
-				// CONSIDER CHANGING THE STRENGTH OF THESE PARTICLES?
 				physics.addCustomForce(new MyAttraction(particles[i], attrParticles[j], WSTRENGTH, 0.1f));
 				temp = i * attrPartNum + j;
 				myAttractions[temp] = physics.getCustomForce(temp);

@@ -8,6 +8,5 @@
 	<classpathentry kind="lib" path="libraries/xuggle-xuggler-5.4.jar"/>
 	<classpathentry kind="lib" path="libraries/slf4j-api.jar"/>
 	<classpathentry kind="lib" path="libraries/themidibus.jar"/>
-	<classpathentry kind="lib" path="libraries/rwmidi.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

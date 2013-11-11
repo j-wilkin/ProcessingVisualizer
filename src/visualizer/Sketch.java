@@ -104,7 +104,12 @@ public class Sketch extends PApplet {
 					break;
 				case 13: WAVE = !WAVE;
 					break;
-				//case 14: MOUSE = !MOUSE;
+				case 14: toggleForceParticles();
+					break;
+				case 15: toggleDownwardGravity();
+					break;
+				case 16: toggleUpwardGravity();
+					break;
 			}
 		
 		// Image Select
@@ -126,6 +131,52 @@ public class Sketch extends PApplet {
 					break;
 			}
 		 
+	}
+	
+	public void toggleForceParticles(){
+		if (ATTR) {
+			ATTR = false;
+		    for (int i=0; i<LENGTH*attrPartNum; i++) {
+		    	myAttractions[i].turnOff();
+		    }
+		    for (int i=0; i<attrPartNum; i++) {
+		    	attrForces[i].turnOff();
+		    }
+		}
+		else {
+			ATTR = true;
+			for (int i=0; i<LENGTH*attrPartNum; i++) {
+		    	myAttractions[i].turnOn();
+		    }
+		    for (int i=0; i<attrPartNum; i++) {
+		    	attrForces[i].turnOn();
+		    }
+		}
+	}
+	
+	
+	public void toggleUpwardGravity(){
+		if (UGRAV) {
+			UGRAV = false;
+			physics.setGravity(0);
+		}
+		else {
+			UGRAV = true;
+			DGRAV = false;
+			physics.setGravity(-2);
+		}
+	}
+	
+	public void toggleDownwardGravity(){
+		if (DGRAV) {
+			DGRAV = false;
+			physics.setGravity(0);
+		}
+		else {
+			DGRAV = true;
+			UGRAV = false;
+			physics.setGravity(2);
+		}
 	}
 	
 	public void setImage(String extName){	
@@ -442,50 +493,17 @@ public class Sketch extends PApplet {
 		
 		// turn force particles on/off
 		if (key == 'f') {
-			if (ATTR) {
-				ATTR = false;
-			    for (int i=0; i<LENGTH*attrPartNum; i++) {
-			    	myAttractions[i].turnOff();
-			    }
-			    for (int i=0; i<attrPartNum; i++) {
-			    	attrForces[i].turnOff();
-			    }
-			}
-			else {
-				ATTR = true;
-				for (int i=0; i<LENGTH*attrPartNum; i++) {
-			    	myAttractions[i].turnOn();
-			    }
-			    for (int i=0; i<attrPartNum; i++) {
-			    	attrForces[i].turnOn();
-			    }
-			}
+			toggleForceParticles();
 		}
 
 		// turn downward gravity on/off
 		if (key == 'g') {
-			if (DGRAV) {
-				DGRAV = false;
-				physics.setGravity(0);
-			}
-			else {
-				DGRAV = true;
-				UGRAV = false;
-				physics.setGravity(2);
-			}
+			toggleDownwardGravity();
 		}
 		
 		// turn upward gravity on/off
 		if (key == 'h') {
-			if (UGRAV) {
-				UGRAV = false;
-				physics.setGravity(0);
-			}
-			else {
-				UGRAV = true;
-				DGRAV = false;
-				physics.setGravity(-2);
-			}
+			toggleUpwardGravity();
 		}
 		
 		// change particle size

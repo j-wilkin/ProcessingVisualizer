@@ -43,13 +43,13 @@ public class Sketch extends PApplet {
     boolean WAVE = false;
     boolean MOUSE = true;
     boolean SPRNG = true;
+    boolean ATTR1 = false;
     float WEIGHT = 5;
     
-	float WSTRENGTH = 1000;
+	float WSTRENGTH = 5000;
 	
-	boolean TTEMP = true;
-	
-	Particle waveParticle;
+	Particle attrParticle;
+	Attraction[] attractions1;
 
 	Particle mouse; // particle on mouse position
 	Particle[] particles; // the moving particle
@@ -142,11 +142,12 @@ public class Sketch extends PApplet {
 		physics.setIntegrator(ParticleSystem.MODIFIED_EULER);
 		mouse = physics.makeParticle(); // create a particle for the mouse
 		mouse.makeFixed(); // don't let forces move it
-		waveParticle = physics.makeParticle(random(MIN_MASS, MAX_MASS), 0, H/2f, 0);
-		waveParticle.makeFixed();
+		attrParticle = physics.makeParticle(random(MIN_MASS, MAX_MASS), 0, H/2f, 0);
+		attrParticle.makeFixed();
 		particles = new Particle[LENGTH];
 		orgParticles = new Particle[LENGTH];
 		springs = new Spring[LENGTH];
+		attractions1 = new Attraction[LENGTH];
 
 		// Makes the visible and anchor particles
 		for (int i = 0; i < LENGTH; i++) {
@@ -159,8 +160,8 @@ public class Sketch extends PApplet {
 			// the springs)
 			springs[i] = physics.makeSpring(particles[i], orgParticles[i], 0.007f, 0.1f, 0);
 			// make the moving particles get away from the mouse
-			//physics.makeAttraction(particles[i], mouse, -5000f, 0.1f);
-			physics.makeAttraction(particles[i], waveParticle, WSTRENGTH, 0.1f);
+			physics.makeAttraction(particles[i], mouse, -5000f, 0.1f);
+			attractions1[i] = physics.makeAttraction(particles[i], attrParticle, WSTRENGTH, 0.1f);
 		}
 		fill(0, 255);
 		rect(0, 0, W, H);
@@ -213,19 +214,19 @@ public class Sketch extends PApplet {
 		for (int i = 0; i < LENGTH; i++) {
 			posx = particles[i].position().x();
 			posy = particles[i].position().y();
-			if (!WAVE && MOUSE) {
-				PALPH = (int) ((distance(posx, mouseX, posy, mouseY))
-						/ (distance(0f, 0f, (float) W, (float) H)) * 255);
-			}
+//			if (!WAVE && MOUSE) {
+//				PALPH = (int) ((distance(posx, mouseX, posy, mouseY))
+//						/ (distance(0f, 0f, (float) W, (float) H)) * 255);
+//			}
 			if (i % NTH_PARTICLE == 0) {
 				if (WSTRENGTH != 0) {
+					if (ATTR1) {
 					// display the interactive wave particle
 					temp = waveLocation(TIME, LENGTH/2);
 					fill(255, 255, 255, 255);
-					if (TTEMP) {
 						ellipse(TIME, temp, WEIGHT, WEIGHT);
+					attrParticle.position().set(TIME, temp, 0);
 					}
-					waveParticle.position().set(TIME, temp, 0);
 				}
 				if (!SPRNG) {
 					// particles are bouncing around without springs
@@ -387,16 +388,6 @@ public class Sketch extends PApplet {
 				NTH_PARTICLE--;
 			}
 		}
-		
-		// temporary, to turn on the repelling particle visual
-		if (key == 'z') {
-			if (TTEMP) {
-				TTEMP = false;
-			}
-			else {
-				TTEMP = true;
-			}
-		}
 
 		// change particle size
 		if (key == '[' && WEIGHT > 1) {
@@ -525,7 +516,22 @@ public class Sketch extends PApplet {
 			}
 		}
 
-
+		// turn attractor1 particle off
+		if (key == 'o') {
+			if (ATTR1) {
+				ATTR1 = false;
+				for (int i=0; i<LENGTH; i++) {
+			    	attractions1[i].turnOff();
+			    }
+			}
+			else {
+				ATTR1 = true;
+				for (int i=0; i<LENGTH; i++) {
+			    	attractions1[i].turnOn();
+			    }
+			}
+		}
+		
 	}
 
 	float distance(float x1, float y1, float x2, float y2) {

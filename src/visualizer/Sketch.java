@@ -30,6 +30,7 @@ public class Sketch extends PApplet {
 	boolean TRAIL = true;
 	int TR_LEN = 90;
 	boolean RAINBOW = false;
+	boolean DGRAV, UGRAV = false;
 	
 	boolean FADEOUT = false;
 	boolean FADEIN = false;
@@ -41,13 +42,17 @@ public class Sketch extends PApplet {
     boolean WAVE = false;
     boolean MOUSE = false;
     boolean SPRNG = true;
-    boolean ATTR1 = false;
     float WEIGHT = 5;
     
-	float WSTRENGTH = 5000;
+	float WSTRENGTH = -5000;
 	
-	Particle attrParticle;
-	Attraction[] attractions1;
+	Particle[] attrParticles;
+	int attrPartNum = 4;
+    boolean ATTR = true;
+	float[][] ATTRV;
+	// NEED TO THINK ABOUT HOW TO SAVE THESE. getCustomForce() after making it?
+	Force[] myAttractions;
+	Force[] attrForces;
 
 	Particle mouse; // particle on mouse position
 	Particle[] particles; // the moving particle
@@ -62,6 +67,7 @@ public class Sketch extends PApplet {
 	
 	public void setImage(String extName){		
 		int[] res;
+		int temp, temp2;
 		input = loadStrings("particles" + extName + ".txt");
 		LENGTH = input.length;
 		locations = new float[2][LENGTH];
@@ -76,15 +82,34 @@ public class Sketch extends PApplet {
 		physics = new ParticleSystem(0, 0.05f);
 		physics.setIntegrator(ParticleSystem.MODIFIED_EULER);
 		mouse = physics.makeParticle(); // create a particle for the mouse
+		mouse.setMass(5f);
 		mouse.makeFixed(); // don't let forces move it
-		attrParticle = physics.makeParticle(random(MIN_MASS, MAX_MASS), 0, H/2f, 0);
-		attrParticle.makeFixed();
+		
+		// initialize the force particles
+		attrParticles = new Particle[attrPartNum];
+		ATTRV = new float[2][attrPartNum];
+		for (int i = 0; i < attrPartNum; i++) {
+			ATTRV[0][i] = random(5,15);
+			ATTRV[1][i] = random(5,15);
+			attrParticles[i] = physics.makeParticle(5, random(1,W-1), random(1,H-1), 0);
+			attrParticles[i].velocity().set(ATTRV[0][i],ATTRV[1][i],0f);
+		}
+		
+		attrForces = new Force[attrPartNum];
+		// create forces between force particles
+		for (int i = 0; i < attrPartNum; i++) {
+			for (int j = 0; j < attrPartNum; j++) {
+				if (!(i == j)) {
+					attrForces[i] = physics.makeAttraction(attrParticles[i], attrParticles[j], -7000, 0.1f);
+				}
+			}
+		}
+		myAttractions = new MyAttraction[LENGTH * attrPartNum];
 		particles = new Particle[LENGTH];
 		orgParticles = new Particle[LENGTH];
 		springs = new Spring[LENGTH];
-		attractions1 = new Attraction[LENGTH];
 
-		// Makes the visible and anchor particles
+		// Makes the visible and anchor particles, the forces surrounding them and the force particles
 		for (int i = 0; i < LENGTH; i++) {
 			particles[i] = physics.makeParticle(random(MIN_MASS, MAX_MASS),
 					locations[0][i], locations[1][i], 0);
@@ -94,9 +119,16 @@ public class Sketch extends PApplet {
 			// make the moving particles go to their former positions (creates
 			// the springs)
 			springs[i] = physics.makeSpring(particles[i], orgParticles[i], 0.007f, 0.1f, 0);
-			// make the moving particles get away from the mouse
+			// make the moving particles move away from the mouse
 			physics.makeAttraction(particles[i], mouse, -5000f, 0.1f);
-			attractions1[i] = physics.makeAttraction(particles[i], attrParticle, WSTRENGTH, 0.1f);
+			// make the forces between the force particles and the springy particles
+			for (int j = 0; j < attrPartNum; j++) {
+				// CONSIDER CHANGING THE STRENGTH OF THESE PARTICLES?
+				physics.addCustomForce(new MyAttraction(particles[i], attrParticles[j], WSTRENGTH, 0.1f));
+				temp = i * attrPartNum + j;
+				myAttractions[temp] = physics.getCustomForce(temp);
+				
+			}
 		}
 		fill(0, 255);
 		rect(0, 0, W, H);
@@ -110,17 +142,16 @@ public class Sketch extends PApplet {
 	public void setup() {
 		// set up an array to hold the time stamps for each frame
 		timeStamps = new long[100000];
-		
+			
 		// GRABS THE LOCATIONS OF PARTICLES FROM THE EDGE-DETECTED PICTURE
 		setImage("0");
-		frameRate(30);
+		//frameRate(30);
 		
 
 	}
 
 	// @SuppressWarnings("deprecation")
 	public void draw() {
-		float temp;
 		// background(0);
 		// Causes particle trails
 		noStroke();
@@ -137,7 +168,38 @@ public class Sketch extends PApplet {
 		mouse.position().set(mouseX, mouseY, 0);
 		PARTICLE_COLOR = rainbowColor(mouseX);
 		physics.tick();
-		float posx, posy, wPosy;
+		
+		if (ATTR) {
+			for (int i = 0; i < attrPartNum; i++) {
+				// combat particle drag for the force particles
+				attrParticles[i].velocity().set(ATTRV[0][i],ATTRV[1][i],0);
+				// prevent force particles from flying off the screen
+				if (attrParticles[i].position().x() < 0) {
+					ATTRV[0][i] = -1 * ATTRV[0][i];
+					attrParticles[i].position().set(0,attrParticles[i].position().y(),0);
+					attrParticles[i].velocity().set(ATTRV[0][i],0,0);
+				}
+				if (attrParticles[i].position().x() > W) {
+					ATTRV[0][i] = -1 * ATTRV[0][i];
+					attrParticles[i].position().set(W,attrParticles[i].position().y(),0);
+					attrParticles[i].velocity().set(ATTRV[0][i],0,0);
+				}
+				if (attrParticles[i].position().y() < 0) {
+					ATTRV[1][i] = -1 * ATTRV[1][i];
+					attrParticles[i].position().set(attrParticles[i].position().x(),0,0);
+					attrParticles[i].velocity().set(0,ATTRV[1][i],0);
+				}
+				if (attrParticles[i].position().y() > H) {
+					ATTRV[1][i] = -1 * ATTRV[1][i];
+					attrParticles[i].position().set(attrParticles[i].position().x(),H,0);
+					attrParticles[i].velocity().set(0,ATTRV[1][i],0);
+				}
+				// display the force particle
+				fill(255, 255, 255, 255);
+				ellipse(attrParticles[i].position().x(),attrParticles[i].position().y(),WEIGHT,WEIGHT);
+			}
+		}
+		float posx, posy;
 		for (int i = 0; i < LENGTH; i++) {
 			posx = particles[i].position().x();
 			posy = particles[i].position().y();
@@ -146,15 +208,6 @@ public class Sketch extends PApplet {
 						/ (distance(0f, 0f, (float) W, (float) H)) * 255);
 			}
 			if (i % NTH_PARTICLE == 0) {
-				if (WSTRENGTH != 0) {
-					if (ATTR1) {
-					// display the interactive wave particle
-					temp = waveLocation(TIME, LENGTH/2);
-					fill(255, 255, 255, 255);
-						ellipse(TIME, temp, WEIGHT, WEIGHT);
-					attrParticle.position().set(TIME, temp, 0);
-					}
-				}
 				if (!SPRNG) {
 					// particles are bouncing around without springs
 					if (posx < 0) {
@@ -315,14 +368,62 @@ public class Sketch extends PApplet {
 				NTH_PARTICLE--;
 			}
 		}
+		
+		// turn force particles on/off
+		if (key == 'f') {
+			if (ATTR) {
+				ATTR = false;
+			    for (int i=0; i<LENGTH*attrPartNum; i++) {
+			    	myAttractions[i].turnOff();
+			    }
+			    for (int i=0; i<attrPartNum; i++) {
+			    	attrForces[i].turnOff();
+			    }
+			}
+			else {
+				ATTR = true;
+				for (int i=0; i<LENGTH*attrPartNum; i++) {
+			    	myAttractions[i].turnOn();
+			    }
+			    for (int i=0; i<attrPartNum; i++) {
+			    	attrForces[i].turnOn();
+			    }
+			}
+		}
 
+		// turn downward gravity on/off
+		if (key == 'g') {
+			if (DGRAV) {
+				DGRAV = false;
+				physics.setGravity(0);
+			}
+			else {
+				DGRAV = true;
+				UGRAV = false;
+				physics.setGravity(2);
+			}
+		}
+		
+		// turn upward gravity on/off
+		if (key == 'h') {
+			if (UGRAV) {
+				UGRAV = false;
+				physics.setGravity(0);
+			}
+			else {
+				UGRAV = true;
+				DGRAV = false;
+				physics.setGravity(-2);
+			}
+		}
+		
 		// change particle size
-		if (key == '[' && WEIGHT > 1) {
+		if (key == '[' && WEIGHT > 1)
 			WEIGHT--;
-		}
-		if (key == ']' && WEIGHT < 20) {
+		
+		if (key == ']' && WEIGHT < 20)
 			WEIGHT++;
-		}
+		
 
 		// turn trails on or off
 		if (key == 't') {
@@ -441,24 +542,7 @@ public class Sketch extends PApplet {
 			    	springs[i].turnOn();
 			    }
 			}
-		}
-
-		// turn attractor1 particle off
-		if (key == 'o') {
-			if (ATTR1) {
-				ATTR1 = false;
-				for (int i=0; i<LENGTH; i++) {
-			    	attractions1[i].turnOff();
-			    }
-			}
-			else {
-				ATTR1 = true;
-				for (int i=0; i<LENGTH; i++) {
-			    	attractions1[i].turnOn();
-			    }
-			}
-		}
-		
+		}	
 	}
 
 	float distance(float x1, float y1, float x2, float y2) {
@@ -532,5 +616,124 @@ public class Sketch extends PApplet {
 		res[0] = Integer.parseInt(temp[0]);
 		res[1] = Integer.parseInt(temp[1]);
 		return res;
+	}
+	
+	public class MyAttraction implements Force
+	{
+		Particle a;
+		Particle b;
+		float k;
+		boolean on;
+		float distanceMin;
+		float distanceMinSquared;
+		
+		public MyAttraction( Particle a, Particle b, float k, float distanceMin )
+		{
+			this.a = a;
+			this.b = b;
+			this.k = k;
+			on = true;
+			this.distanceMin = distanceMin;
+			this.distanceMinSquared = distanceMin*distanceMin;
+		}
+
+		protected void setA( Particle p )
+		{
+			a = p;
+		}
+
+		protected void setB( Particle p )
+		{
+			b = p;
+		}
+
+		public final float getMinimumDistance()
+		{
+			return distanceMin;
+		}
+
+		public final void setMinimumDistance( float d )
+		{
+			distanceMin = d;
+			distanceMinSquared = d*d;
+		}
+
+		public final void turnOff()
+		{
+			on = false;
+		}
+
+		public final void turnOn()
+		{
+			on = true;
+		}
+
+		public final void setStrength( float k )
+		{
+			this.k = k;
+		}
+
+		public final Particle getOneEnd()
+		{
+			return a;
+		}
+
+		public final Particle getTheOtherEnd()
+		{
+			return b;
+		}
+
+		public void apply()
+		{
+			if ( on && ( a.isFree() || b.isFree() ) )
+			{
+				float a2bX = a.position().x() - b.position().x();
+				float a2bY = a.position().y() - b.position().y();
+				float a2bZ = a.position().z() - b.position().z();
+
+				float a2bDistanceSquared = a2bX*a2bX + a2bY*a2bY + a2bZ*a2bZ;
+
+				if ( a2bDistanceSquared < distanceMinSquared )
+					a2bDistanceSquared = distanceMinSquared;
+
+				float force = k * a.mass() * b.mass() / a2bDistanceSquared;
+
+				float length = (float)Math.sqrt( a2bDistanceSquared );
+				
+				// make unit vector
+				
+				a2bX /= length;
+				a2bY /= length;
+				a2bZ /= length;
+				
+				// multiply by force 
+				
+				a2bX *= force;
+				a2bY *= force;
+				a2bZ *= force;
+
+				// apply
+				
+				if ( a.isFree() )
+					a.force().add( -a2bX, -a2bY, -a2bZ );
+				//if ( b.isFree() )
+					//b.force().add( a2bX, a2bY, a2bZ );
+			}
+		}
+
+		public final float getStrength()
+		{
+			return k;
+		}
+
+		public final boolean isOn()
+		{
+			return on;
+		}
+
+		public final boolean isOff()
+		{
+			return !on;
+		}
 	}
 }

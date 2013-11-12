@@ -1,13 +1,32 @@
 package visualizer;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.util.ArrayList;
 
 public class DisplayFrame extends javax.swing.JFrame {
     public DisplayFrame(){
-        this.setSize(800, 800); //The window Dimensions
+        // Get size of the screen
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        //this.setSize(dim.width, dim.height);
+        this.setSize(1080, 720);
+    	// Determine the new location of the window
+        int w = this.getSize().width;
+        int h = this.getSize().height;
+        int x = (dim.width-w)/2;
+        int y = (dim.height-h)/2;
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         javax.swing.JPanel panel = new javax.swing.JPanel();
-        panel.setBounds(0, 0, 50, 50);
+        panel.setLayout(null);
+        // this.setContentPane(panel);
+        // panel.setBounds(0, 0, 50, 50);
+
+        this.setLocation(0, 0);
+        // Fix and move to center
+        //this.setLocation((1080-w)/2, (720-h)/2);
+        //this.setPreferredSize(new Dimension(w, h)); //The window Dimensions
+        this.setPreferredSize(new Dimension(1080, 720)); //The window Dimensions
         processing.core.PApplet sketch = new Sketch();
         panel.add(sketch);
         this.add(panel);

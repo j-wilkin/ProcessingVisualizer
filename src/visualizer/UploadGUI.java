@@ -99,7 +99,7 @@ public class UploadGUI implements ActionListener {
     	
     	//entireGUI.add(bluePanel);
     	
-    	nextButton =  new JButton("Next");
+    	nextButton = new JButton("Next");
     	nextButton.setLocation(200, 350);
     	nextButton.setSize(100, 50);
     	nextButton.addActionListener(this);
@@ -115,7 +115,8 @@ public class UploadGUI implements ActionListener {
     	if(e.getSource() == nextButton)
     	{
     		//also could use .dispose()... unsure which atm
-    		welcomeFrame.setVisible(false);
+    		//welcomeFrame.setVisible(false);
+    		welcomeFrame.dispose();
     		fileUpload();
     	}
     }

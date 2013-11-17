@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 
+
+
 public class DisplayFrame extends javax.swing.JFrame {
     public DisplayFrame(){
         // Get size of the screen
@@ -32,5 +34,7 @@ public class DisplayFrame extends javax.swing.JFrame {
         this.add(panel);
         sketch.init(); //this is the function used to start the execution of the sketch
         this.setVisible(true);
+
+	    
     }
 }

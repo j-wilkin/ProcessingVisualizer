@@ -125,9 +125,9 @@ public class Main {
 	    	nextButton = new JButton("Next");
 	    	nextButton.setLocation(200, 350);
 	    	nextButton.setSize(100, 50);
-	    	nextButton.addActionListener(this);
+	    	//nextButton.addActionListener(this);
 	    	buttonPanel.add(nextButton);
-	    	
+	    
 	    	
 	    	//content panes must be opaque
 	    	entireGUI.setOpaque(true);

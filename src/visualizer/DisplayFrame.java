@@ -10,8 +10,8 @@ public class DisplayFrame extends javax.swing.JFrame {
     public DisplayFrame(){
         // Get size of the screen
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        //this.setSize(dim.width, dim.height);
-        this.setSize(1080, 720);
+        this.setSize(dim.width, dim.height);
+        //this.setSize(1080, 720);
     	// Determine the new location of the window
         int w = this.getSize().width;
         int h = this.getSize().height;
@@ -28,7 +28,7 @@ public class DisplayFrame extends javax.swing.JFrame {
         // Fix and move to center
         //this.setLocation((1080-w)/2, (720-h)/2);
         //this.setPreferredSize(new Dimension(w, h)); //The window Dimensions
-        this.setPreferredSize(new Dimension(1080, 720)); //The window Dimensions
+        this.setPreferredSize(new Dimension(dim.width, dim.height)); //The window Dimensions
         processing.core.PApplet sketch = new Sketch();
         panel.add(sketch);
         this.add(panel);

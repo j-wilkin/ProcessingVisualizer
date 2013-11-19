@@ -2,6 +2,7 @@ package visualizer;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.File;
 import java.nio.ByteBuffer;
 
@@ -188,8 +189,10 @@ public class Sketch extends PApplet {
 		locations = new float[2][LENGTH];
 		Colors = new int[LENGTH][3];
 		res = readInput(input);
-		W = 1080; //res[0];
-		H = 720; //res[1];
+		W = Toolkit.getDefaultToolkit().getScreenSize().width;
+		H = Toolkit.getDefaultToolkit().getScreenSize().height;
+		//W = 1080; //res[0];
+		//H = 720; //res[1];
 		TIME = 0;
 		TIME2 = W / 2;
 		

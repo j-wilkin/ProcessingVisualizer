@@ -131,7 +131,7 @@ public class Main {
 	    	nextButton.setSize(100, 50);
 	    	//nextButton.addActionListener(this);
 	    	buttonPanel.add(nextButton);
-	    	
+	    
 	    	
 	    	//content panes must be opaque
 	    	entireGUI.setOpaque(true);

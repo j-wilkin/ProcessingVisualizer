@@ -127,7 +127,7 @@ public class LoadProcessing {
 	    	nextButton = new JButton("Next");
 	    	nextButton.setLocation(200, 350);
 	    	nextButton.setSize(100, 50);
-	    	nextButton.addActionListener(this);
+	    	// nextButton.addActionListener(this);
 	    	buttonPanel.add(nextButton);
 	    	
 	    	

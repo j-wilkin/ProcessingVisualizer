@@ -2,6 +2,7 @@ package visualizer;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
+@SuppressWarnings("serial")
 public class FileUploadTest extends Frame implements ActionListener
 {
 	FileDialog fd1;

@@ -1,7 +1,7 @@
 package visualizer;
 import java.awt.*;
 import javax.swing.*;
-
+@SuppressWarnings("serial")
 public class CheatSheet extends JFrame {
 	protected JLabel instructions;
 	

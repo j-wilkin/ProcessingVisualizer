@@ -10,6 +10,7 @@ import processing.core.*;
 import traer.physics.*;
 import themidibus.*;
 
+@SuppressWarnings({ "unused", "serial" })
 public class Sketch extends PApplet {
 
 	// Recording variables
@@ -18,6 +19,7 @@ public class Sketch extends PApplet {
 	int frames = 0;
 	long[] timeStamps;
 	long fTime;
+	long sTime;
 	boolean recording;
 
 	// Sketch variables
@@ -562,26 +564,26 @@ public class Sketch extends PApplet {
 			}
 		}
 		
-		// press 'r' to start/stop recording
-//		if (key == 'r') {
-//		     if(!recording){
-//		        recording = true;
-//		        boolean success = (new File("pics")).mkdir();
-//		        frames = 0;
-//		        sTime = fTime = System.nanoTime();
-//		     }
-//		     else{
-//		    	recording = false;
-//		     }
-//		  }
-//		// press 's' to export
-//		if (key == 's') {
-//		     if(recording)
-//		        recording = false;
-//		     for(int i=0; i<11; i++){
-//		    	 new encodeVideo(frames, vidRate, sTime, timeStamps);
-//		     }
-//		}
+		//press 'r' to start/stop recording
+		if (key == 'r') {
+		     if(!recording){
+		        recording = true;
+		        boolean success = (new File("pics")).mkdir();
+		        frames = 0;
+		        sTime = fTime = System.nanoTime();
+		     }
+		     else{
+		    	recording = false;
+		     }
+		  }
+		// press 's' to export
+		if (key == 's') {
+		     if(recording)
+		        recording = false;
+		     for(int i=0; i<11; i++){
+		    	 new encodeVideo(frames, vidRate, sTime, timeStamps);
+		     }
+		}
 
 
 		if (key == '1'){

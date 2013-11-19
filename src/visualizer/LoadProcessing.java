@@ -1,14 +1,13 @@
 package visualizer;
 
 import java.awt.Dimension;
-import java.awt.List;
 import java.awt.Toolkit;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -19,36 +18,36 @@ import javax.swing.WindowConstants;
 
 import net.coobird.thumbnailator.Thumbnails;
 
-public class Main {
+public class LoadProcessing {
 	JButton nextButton;
 	
-	public static int[] getPixelRGB(int pixel) {
+	public int[] getPixelRGB(int pixel) {
 	    int red = (pixel >> 16) & 0xff;
 	    int green = (pixel >> 8) & 0xff;
 	    int blue = (pixel) & 0xff;
 	    return new int[] {red, green, blue};
 	  }
 	
-	public static int getPixelSum(int pixel){
+	public int getPixelSum(int pixel){
 		int[] pixArray = getPixelRGB(pixel);
 		return pixArray[0] + pixArray[1] + pixArray[2];
 		
 	}
 	
-	public static void loadProcessing(String filename, String nameExt) throws IOException {
-		//JFrame edgeDetectFrame;
-		//edgeDetectFrame = new JFrame("Edge Detection for Image" + nameExt);
-        //edgeDetectFrame.setSize(500, 500); //The window Dimensions
-        //edgeDetectFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+	public void loadProcessing(String filename, String nameExt) throws IOException {
+		JFrame edgeDetectFrame;
+		edgeDetectFrame = new JFrame("Edge Detection for Image" + nameExt);
+        edgeDetectFrame.setSize(500, 500); //The window Dimensions
+        edgeDetectFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         
         // Get size of the screen
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         
         // Determine the new location of the window
-        //int w = edgeDetectFrame.getSize().width;
-        //int h = edgeDetectFrame.getSize().height;
-        //int x = (dim.width-w)/2;
-        //int y = (dim.height-h)/2;
+        int w = edgeDetectFrame.getSize().width;
+        int h = edgeDetectFrame.getSize().height;
+        int x = (dim.width-w)/2;
+        int y = (dim.height-h)/2;
          
         // Move the window
         //edgeDetectFrame.setLocation(x, y);
@@ -56,7 +55,6 @@ public class Main {
         //edgeDetectFrame.setVisible(true);
         //UploadGUI test = new UploadGUI();
         //edgeDetectFrame.setContentPane(test.createContentPane());
-		//edgeDetectFrame.setVisible(true);
 		
 		BufferedImage image = ImageIO.read( new File( filename ) );
 		visualizer.CannyEdgeDetector detector = new visualizer.CannyEdgeDetector();
@@ -129,7 +127,7 @@ public class Main {
 	    	nextButton = new JButton("Next");
 	    	nextButton.setLocation(200, 350);
 	    	nextButton.setSize(100, 50);
-	    	//nextButton.addActionListener(this);
+	    	nextButton.addActionListener(this);
 	    	buttonPanel.add(nextButton);
 	    	
 	    	
@@ -137,11 +135,4 @@ public class Main {
 	    	entireGUI.setOpaque(true);
 	    	return entireGUI;
 	    }
-	
-	public static void main(String[] args) {
-		//Open a file
-		
-		UploadGUI intro = new UploadGUI();
-		
-	}
 }

@@ -50,8 +50,9 @@ public class UploadGUI implements ActionListener {
 		{
 			// for loop for loadProcessing
 			for (int i = 0; i < numFiles; i++) {
-				Main.loadProcessing("input/" + files[i].getName(), Integer.toString(i));
+				Main.loadProcessing(files[i].getAbsolutePath(), Integer.toString(i));
 			}
+			//EdgeDetectionFlow();
 			//Main.loadProcessing(fname, numImage);
 			new DisplayFrame().setVisible(true);
 		}
@@ -121,7 +122,7 @@ public class UploadGUI implements ActionListener {
     	}
     }
     
-    public static int getNumFiles(){
+    public int getNumFiles(){
     	return numFiles;
     }
 }

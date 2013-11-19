@@ -3,9 +3,7 @@ package visualizer;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.util.ArrayList;
-
-
-
+@SuppressWarnings({ "serial", "unused" })
 public class DisplayFrame extends javax.swing.JFrame {
     public DisplayFrame(){
         // Get size of the screen

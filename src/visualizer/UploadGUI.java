@@ -124,7 +124,6 @@ public class UploadGUI implements ActionListener {
     	nextButton.setSize(100, 50);
     	nextButton.addActionListener(this);
     	buttonPanel.add(nextButton);
-
     	
     	recordButton = new JButton("Record");
     	recordButton.setLocation(200, 275);

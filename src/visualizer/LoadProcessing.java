@@ -1,7 +1,9 @@
 package visualizer;
 
+import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -19,49 +21,52 @@ import javax.swing.WindowConstants;
 import net.coobird.thumbnailator.Thumbnails;
 
 public class LoadProcessing {
+	JFrame welcomeFrame;
 	JButton nextButton;
 	
-	public int[] getPixelRGB(int pixel) {
+	public static int[] getPixelRGB(int pixel) {
 	    int red = (pixel >> 16) & 0xff;
 	    int green = (pixel >> 8) & 0xff;
 	    int blue = (pixel) & 0xff;
 	    return new int[] {red, green, blue};
 	  }
 	
-	public int getPixelSum(int pixel){
+	public static int getPixelSum(int pixel){
 		int[] pixArray = getPixelRGB(pixel);
 		return pixArray[0] + pixArray[1] + pixArray[2];
 		
 	}
 	
-	public void loadProcessing(String filename, String nameExt) throws IOException {
-		JFrame edgeDetectFrame;
-		edgeDetectFrame = new JFrame("Edge Detection for Image" + nameExt);
-        edgeDetectFrame.setSize(500, 500); //The window Dimensions
-        edgeDetectFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        
-        // Get size of the screen
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        
-        // Determine the new location of the window
-        int w = edgeDetectFrame.getSize().width;
-        int h = edgeDetectFrame.getSize().height;
-        int x = (dim.width-w)/2;
-        int y = (dim.height-h)/2;
-         
-        // Move the window
-        //edgeDetectFrame.setLocation(x, y);
-        //edgeDetectFrame.setContentPane(createEdgeDetectPane());
-        //edgeDetectFrame.setVisible(true);
-        //UploadGUI test = new UploadGUI();
-        //edgeDetectFrame.setContentPane(test.createContentPane());
-		
+	public void getEdges(String filename, String nameExt, int index, File[] files, float lowThres, float highThres) throws IOException {
+		// Get the image
 		BufferedImage image = ImageIO.read( new File( filename ) );
+			
+		// EDGE DETECTION
 		visualizer.CannyEdgeDetector detector = new visualizer.CannyEdgeDetector();
+		detector.setLowThreshold(lowThres);
+		detector.setHighThreshold(highThres);
+		detector.setSourceImage(image);
+		detector.process();
+		BufferedImage edges = detector.getEdgesImage();
+
+		File outputfile = new File("image" + nameExt + ".jpg");
+		ImageIO.write(edges, "jpg", outputfile);
+	}
+	
+	public void loadProcessing(String filename, String nameExt, int index, File[] files, float lowThres, float highThres) throws IOException {
+		
+		// Get the image
+		BufferedImage image = ImageIO.read( new File( filename ) );
+		
+		// EDGE DETECTION
+		visualizer.CannyEdgeDetector detector = new visualizer.CannyEdgeDetector();
+		detector.setLowThreshold(lowThres);
+		detector.setHighThreshold(highThres);
 		detector.setSourceImage(image);
 		detector.process();
 		BufferedImage edges = detector.getEdgesImage();
     	
+		// print the dimensions of the photo
     	int startW = edges.getWidth();
     	int startH = edges.getHeight();
     	System.out.println(startW);
@@ -72,12 +77,21 @@ public class LoadProcessing {
     	int newH = Math.round(startH * ratio);
     	System.out.println(newW);
     	System.out.println(newH);
+    	
+    	// attempted cropping that's currently not doing anything
+    	// TODO set up cropping/resizing
     	BufferedImage thumb = Thumbnails.of(edges).size(newW, newH).asBufferedImage();
     	BufferedImage orig = Thumbnails.of(image).size(newW, newH).asBufferedImage();
+    	
+    	File outputfile = new File("image" + nameExt + ".jpg");
+    	ImageIO.write(edges, "jpg", outputfile);
+    	
+    	
     	PrintStream out = new PrintStream(new FileOutputStream("particles" + nameExt + ".txt"));
     	System.setOut(out);
     	out.println(newW + " " + newH);
     	
+    	// get the colors for each coordinate in the file
     	for( int i = 0; i < thumb.getWidth(); i++ )
     	    for( int j = 0; j < thumb.getHeight(); j++ ){
     	    	int pix = thumb.getRGB( i, j );
@@ -93,46 +107,12 @@ public class LoadProcessing {
     	out.close();
     	
     	//new DisplayFrame().setVisible(true);
+    	
+    	if (index < (files.length - 1)) {
+    		EdgeDetectFlow walkthrough = new EdgeDetectFlow(files[index + 1].getAbsolutePath(), Integer.toString(index + 1), index + 1, files);
+			walkthrough.determineEdgeDetect(Integer.toString(index + 1));
+    	} else {
+    		new DisplayFrame().setVisible(true);
+    	}
 	}
-	
-	 public JPanel createEdgeDetectPane() {
-	    	JPanel entireGUI = new JPanel();
-	    	entireGUI.setLayout(null);
-	    	
-	    	JPanel textPanel = new JPanel();
-	    	textPanel.setLayout(null);
-	    	textPanel.setLocation(0, 0);
-	    	textPanel.setSize(500, 250);
-	    	entireGUI.add(textPanel);
-	    	
-	    	JPanel buttonPanel = new JPanel();
-	    	buttonPanel.setLayout(null);
-	    	buttonPanel.setLocation(0,0);
-	    	buttonPanel.setSize(500, 500);
-	    	entireGUI.add(buttonPanel);
-	    	
-	    	JLabel welcomeText = new JLabel("Welcome to our Processing App (Beta)");
-	    	JLabel welcomeText2 = new JLabel("Please click next to continue...");
-	    	welcomeText.setLocation(0, 0);
-	    	welcomeText.setSize(500, 100);
-	    	welcomeText.setHorizontalAlignment(0);
-	    	welcomeText2.setLocation(0, 100);
-	    	welcomeText2.setSize(500, 100);
-	    	welcomeText2.setHorizontalAlignment(0);
-	    	textPanel.add(welcomeText);
-	    	textPanel.add(welcomeText2);
-	    	
-	    	//entireGUI.add(bluePanel);
-	    	// JButton nextButton;
-	    	nextButton = new JButton("Next");
-	    	nextButton.setLocation(200, 350);
-	    	nextButton.setSize(100, 50);
-	    	// nextButton.addActionListener(this);
-	    	buttonPanel.add(nextButton);
-	    	
-	    	
-	    	//content panes must be opaque
-	    	entireGUI.setOpaque(true);
-	    	return entireGUI;
-	    }
 }

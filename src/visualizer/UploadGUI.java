@@ -57,30 +57,19 @@ public class UploadGUI implements ActionListener {
         welcomeFrame.setVisible(true);
     }
     
-    public void fileUpload() throws AWTException {
+    public void fileUpload() throws AWTException, IOException {
     	
     	JFileChooser chooser = new JFileChooser();
     	chooser.setMultiSelectionEnabled(true);
 		chooser.showOpenDialog(welcomeFrame);
+		
+		// Check to make sure files are jpgs and not txt or anything else
     	File[] files = chooser.getSelectedFiles();
     	System.out.println(files.length);
     	numFiles = files.length;
     	System.out.println(numFiles);
-		try
-		{
-			// for loop for loadProcessing
-			for (int i = 0; i < numFiles; i++) {
-				Main.loadProcessing(files[i].getAbsolutePath(), Integer.toString(i));
-			}
-			//EdgeDetectionFlow();
-			//Main.loadProcessing(fname, numImage);
-			new DisplayFrame().setVisible(true);
-		}
-		catch(IOException e)
-		{
-			System.exit(0);
-		}
-    	
+		EdgeDetectFlow walkthrough = new EdgeDetectFlow(files[0].getAbsolutePath(), Integer.toString(0), 0, files);
+		walkthrough.determineEdgeDetect(Integer.toString(0)); 	
     }
     
     public void imagePreviews() {
@@ -88,9 +77,10 @@ public class UploadGUI implements ActionListener {
     }
     
     public void startSketch() {
-    	
+    	new DisplayFrame().setVisible(true);
     }
     
+    // Clean up the UI for this
     public JPanel createContentPane() {
     	JPanel entireGUI = new JPanel();
     	entireGUI.setLayout(null);
@@ -148,11 +138,13 @@ public class UploadGUI implements ActionListener {
     	{
     		//also could use .dispose()... unsure which atm
     		//welcomeFrame.setVisible(false);
-
-//    		welcomeFrame.dispose();
+    		welcomeFrame.dispose();
     		try {
 				fileUpload();
 			} catch (AWTException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}

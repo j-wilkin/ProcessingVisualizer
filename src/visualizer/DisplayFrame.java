@@ -28,7 +28,12 @@ public class DisplayFrame extends javax.swing.JFrame {
         //this.setPreferredSize(new Dimension(w, h)); //The window Dimensions
         this.setPreferredSize(new Dimension(dim.width, dim.height)); //The window Dimensions
         processing.core.PApplet sketch = new Sketch();
+        
+        //processing.core.PApplet.main(new String[] {"--present", "visualizer.Sketch"});
         panel.add(sketch);
+        //panel.setLocation(0,0);
+        //sketch.setLocation(0,0);
+        //this.add(sketch);
         this.add(panel);
         sketch.init(); //this is the function used to start the execution of the sketch
         this.setVisible(true);

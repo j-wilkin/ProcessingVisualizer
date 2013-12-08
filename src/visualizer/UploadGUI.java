@@ -74,7 +74,13 @@ public class UploadGUI implements ActionListener {
 			}
 			//EdgeDetectionFlow();
 			//Main.loadProcessing(fname, numImage);
-			new DisplayFrame().setVisible(true);
+			
+			// MAYBE THE SOLUTION
+			processing.core.PApplet sketch = new Sketch();
+	        processing.core.PApplet.main(new String[] {"--present", "visualizer.Sketch"});
+			//new FullScreenTest().main();
+			//new DisplayFrame().setVisible(true);
+			//new DisplayFrame();
 		}
 		catch(IOException e)
 		{

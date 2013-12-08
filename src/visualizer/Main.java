@@ -37,13 +37,16 @@ public class Main {
 	}
 	
 	public static void loadProcessing(String filename, String nameExt) throws IOException {
+		int diffW, diffH, newDiffW, newDiffH;
+		boolean adjustX = false;
+		float ratio;
 		//JFrame edgeDetectFrame;
 		//edgeDetectFrame = new JFrame("Edge Detection for Image" + nameExt);
         //edgeDetectFrame.setSize(500, 500); //The window Dimensions
         //edgeDetectFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         
         // Get size of the screen
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();        
         
         // Determine the new location of the window
         //int w = edgeDetectFrame.getSize().width;
@@ -64,17 +67,41 @@ public class Main {
 		detector.setSourceImage(image);
 		detector.process();
 		BufferedImage edges = detector.getEdgesImage();
-    	
+		
     	int startW = edges.getWidth();
     	int startH = edges.getHeight();
     	System.out.println(startW);
     	System.out.println(startH);
-    	float ratio = 1;
+    	
+    	// Difference in image vs screen size
+    	diffW = dim.width - startW;
+    	diffH = dim.height - startH;
+    	
+    	// Creates ratio to scale the image up or down
+    	if (diffW < diffH) {
+    		ratio = dim.width/startW;
+    	}
+    	else {
+    		ratio = dim.height/startH;
+    	}
+    	
     	System.out.println(ratio);
     	int newW = Math.round(startW * ratio);
     	int newH = Math.round(startH * ratio);
     	System.out.println(newW);
     	System.out.println(newH);
+    	
+    	newDiffW = dim.width - newW;
+    	newDiffH = dim.height - newH;
+    	
+    	if (newDiffW > newDiffH) {
+    		adjustX = true;
+    		newDiffW /= 2;
+    	}
+    	else {
+    		newDiffH /= 2;
+    	}
+    	
     	BufferedImage thumb = Thumbnails.of(edges).size(newW, newH).asBufferedImage();
     	BufferedImage orig = Thumbnails.of(image).size(newW, newH).asBufferedImage();
     	PrintStream out = new PrintStream(new FileOutputStream("particles" + nameExt + ".txt"));
@@ -89,7 +116,15 @@ public class Main {
     	        	int[] pixArray = getPixelRGB(colorPix);
     	        	String tup = "(" + pixArray[0] + ", " + pixArray[1] + ", " +
     	        			pixArray[2] + ")";
-    	        	String coord = i + " " + j + " " + tup;
+    	        	String coord = "";
+    	        	// Move image horizontally to the center
+    	        	if (adjustX) {
+        	        	coord = (i + newDiffW) + " " + j + " " + tup;    	        		
+    	        	}
+    	        	// Move image vertically to the center
+    	        	else {
+    	        		coord = i + " " + (j + newDiffH) + " " + tup;
+    	        	}
     	        	out.println(coord);
     	        }
     	    }

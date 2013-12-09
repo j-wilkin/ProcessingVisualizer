@@ -20,7 +20,7 @@ public class Sketch extends PApplet {
 	long[] timeStamps;
 	long fTime;
 	long sTime;
-	boolean recording;
+	boolean recording = false;
 
 	// Sketch variables
 
@@ -35,7 +35,7 @@ public class Sketch extends PApplet {
 	boolean TRAIL = true;
 	int TR_LEN = 90;
 	boolean RAINBOW = false;
-	boolean DGRAV, UGRAV = false;
+	boolean DGRAV, UGRAV, LGRAV, RGRAV = false;
 	
 	boolean FADEOUT = false;
 	boolean FADEIN = false;
@@ -53,10 +53,11 @@ public class Sketch extends PApplet {
 	
 	Particle[] attrParticles;
 	int attrPartNum = 4;
-    boolean ATTR = false;
+    boolean ATTR = true;
 	float[][] ATTRV;
 	Force[] myAttractions;
 	Force[] attrForces;
+	Force[] mouseForces;
 
 	Particle mouse; // particle on mouse position
 	Particle[] particles; // the moving particle
@@ -68,6 +69,9 @@ public class Sketch extends PApplet {
 	String[] input;
 	int LENGTH;
 
+	public boolean sketchFullScreen() {
+		  return true;
+		}
 	
 	public void controllerChange(int channel, int number, int value){
 		println("Channel: " + channel);
@@ -92,18 +96,7 @@ public class Sketch extends PApplet {
 					break;
 				case 12: RAINBOW = !RAINBOW;
 					break;
-				case 11: if (SPRNG) {
-							SPRNG = false;
-						    for (int i=0; i<LENGTH; i++) {
-						    	springs[i].turnOff();
-						    }
-						}
-						else {
-							SPRNG = true;
-							for (int i=0; i<LENGTH; i++) {
-						    	springs[i].turnOn();
-						    }
-						}
+				case 11: toggleSprings();
 					break;
 				case 13: WAVE = !WAVE;
 					break;
@@ -161,24 +154,94 @@ public class Sketch extends PApplet {
 	public void toggleUpwardGravity(){
 		if (UGRAV) {
 			UGRAV = false;
-			physics.setGravity(0);
+			if (LGRAV) physics.setGravity(-2, 0, 0);
+			else if (RGRAV) physics.setGravity(2, 0, 0);
+			else physics.setGravity(0);
 		}
 		else {
 			UGRAV = true;
 			DGRAV = false;
-			physics.setGravity(-2);
+			if (LGRAV) physics.setGravity(-2, -2, 0);
+			else if (RGRAV) physics.setGravity(2, -2, 0);
+			else physics.setGravity(-2);
 		}
 	}
 	
 	public void toggleDownwardGravity(){
 		if (DGRAV) {
 			DGRAV = false;
-			physics.setGravity(0);
+			if (LGRAV) physics.setGravity(-2, 0, 0);
+			else if (RGRAV) physics.setGravity(2, 0, 0);
+			else physics.setGravity(0);
 		}
 		else {
 			DGRAV = true;
 			UGRAV = false;
-			physics.setGravity(2);
+			if (LGRAV) physics.setGravity(-2, 2, 0);
+			else if (RGRAV) physics.setGravity(2, 2, 0);
+			else physics.setGravity(2);
+		}
+	}
+	
+	public void toggleLeftGravity(){
+		if (LGRAV) {
+			LGRAV = false;
+			if (DGRAV) physics.setGravity(0, 2, 0);
+			else if (UGRAV) physics.setGravity(0, -2, 0);
+			else physics.setGravity(0);
+		}
+		else {
+			LGRAV = true;
+			RGRAV = false;
+			if (DGRAV) physics.setGravity(-2, 2, 0);
+			else if (UGRAV) physics.setGravity(-2, -2, 0);
+			else physics.setGravity(-2, 0, 0);
+		}
+	}
+	
+	public void toggleRightGravity(){
+		if (RGRAV) {
+			RGRAV = false;
+			if (DGRAV) physics.setGravity(0, 2, 0);
+			else if (UGRAV) physics.setGravity(0, -2, 0);
+			else physics.setGravity(0);
+		}
+		else {
+			RGRAV = true;
+			LGRAV = false;
+			if (DGRAV) physics.setGravity(2, 2, 0);
+			else if (UGRAV) physics.setGravity(2, -2, 0);
+			else physics.setGravity(2, 0, 0);
+		}
+	}
+	
+	public void toggleSprings() {
+		if (SPRNG) {
+			SPRNG = false;
+		    for (int i=0; i<LENGTH; i++) {
+		    	springs[i].turnOff();
+		    }
+		}
+		else {
+			SPRNG = true;
+			for (int i=0; i<LENGTH; i++) {
+		    	springs[i].turnOn();
+		    }
+		}	
+	}
+	
+	public void toggleMouse() {
+		if (MOUSE) {
+			MOUSE = false;
+		    for (int i=0; i<LENGTH; i++) {
+		    	mouseForces[i].turnOff();
+		    }
+		}
+		else {
+			MOUSE = true;
+			for (int i=0; i<LENGTH; i++) {
+		    	mouseForces[i].turnOn();
+		    }
 		}
 	}
 	
@@ -228,6 +291,7 @@ public class Sketch extends PApplet {
 		particles = new Particle[LENGTH];
 		orgParticles = new Particle[LENGTH];
 		springs = new Spring[LENGTH];
+		mouseForces = new Force[LENGTH];
 
 		// Makes the visible and anchor particles, the forces surrounding them and the force particles
 		for (int i = 0; i < LENGTH; i++) {
@@ -240,7 +304,7 @@ public class Sketch extends PApplet {
 			// the springs)
 			springs[i] = physics.makeSpring(particles[i], orgParticles[i], 0.007f, 0.1f, 0);
 			// make the moving particles move away from the mouse
-			physics.makeAttraction(particles[i], mouse, -5000f, 0.1f);
+			mouseForces[i] = physics.makeAttraction(particles[i], mouse, -6000f, 0.1f);
 			// make the forces between the force particles and the springy particles
 			for (int j = 0; j < attrPartNum; j++) {
 				physics.addCustomForce(new MyAttraction(particles[i], attrParticles[j], WSTRENGTH, 0.1f));
@@ -264,18 +328,22 @@ public class Sketch extends PApplet {
 	}
 	
 	public void setup() {
+		
+		frame.setBackground(new Color(255,0,0));
+		size(displayWidth, displayHeight);
+		noCursor();
 		// set up an array to hold the time stamps for each frame
 		timeStamps = new long[100000];
 			
 		// GRABS THE LOCATIONS OF PARTICLES FROM THE EDGE-DETECTED PICTURE
 		setImage("0");
+		// precautionary measure to make sure there's no ghost force particles at setup
+		toggleForceParticles();
 		frameRate(30);
 		MidiBus.list();
 		MidiBus myBus = new MidiBus(this, 0, 0);
 		
 	}
-	
-	
 
 	// @SuppressWarnings("deprecation")
 	public void draw() {
@@ -323,17 +391,13 @@ public class Sketch extends PApplet {
 				}
 				// display the force particle
 				fill(255, 255, 255, 255);
-				ellipse(attrParticles[i].position().x(),attrParticles[i].position().y(),WEIGHT,WEIGHT);
+				ellipse(attrParticles[i].position().x(),attrParticles[i].position().y(),5,5);
 			}
 		}
 		float posx, posy;
 		for (int i = 0; i < LENGTH; i++) {
 			posx = particles[i].position().x();
 			posy = particles[i].position().y();
-//			if (!WAVE && MOUSE) {
-//				PALPH = (int) ((distance(posx, mouseX, posy, mouseY))
-//						/ (distance(0f, 0f, (float) W, (float) H)) * 255);
-//			}
 			if (i % NTH_PARTICLE == 0) {
 				if (!SPRNG) {
 					// particles are bouncing around without springs
@@ -418,6 +482,18 @@ public class Sketch extends PApplet {
 				}
 			}
 		}
+		
+		// Display the mouse as a particle, placed here so it is drawn on top of all the partcles
+		// Mouse is faded if the force is turned off
+		if (MOUSE) {
+			fill(255, 255, 255, 255);
+			ellipse(mouseX, mouseY, 5, 5);
+		}
+		else {
+			fill(255, 255, 255, 140);
+			ellipse(mouseX, mouseY, 4, 4);
+		}
+		
 		if (!FADEOUT && !FADEIN){
 			if (!WAVE) {
 				if (PALPH < 255) {
@@ -497,19 +573,22 @@ public class Sketch extends PApplet {
 		}
 		
 		// turn force particles on/off
-		if (key == 'f') {
-			toggleForceParticles();
-		}
+		if (key == 'f') toggleForceParticles();
 
 		// turn downward gravity on/off
-		if (key == 'g') {
-			toggleDownwardGravity();
-		}
+		if (key == 'g') toggleDownwardGravity();
 		
 		// turn upward gravity on/off
-		if (key == 'h') {
-			toggleUpwardGravity();
-		}
+		if (key == 'h') toggleUpwardGravity();
+		
+		// turn sideways gravity on/off, to the left
+		if (key == 'j') toggleLeftGravity();
+		
+		// turn sideways gravity on/off, to the right
+		if (key == 'k') toggleRightGravity();
+		
+		// turn off gravity
+		if (key == 'l') physics.setGravity(0);
 		
 		// change particle size
 		if (key == '[' && WEIGHT > 1)
@@ -520,22 +599,10 @@ public class Sketch extends PApplet {
 		
 
 		// turn trails on or off
-		if (key == 't') {
-			if (TRAIL) {
-				TRAIL = false;
-			} else {
-				TRAIL = true;
-			}
-		}
+		if (key == 't') TRAIL = !TRAIL;
 		
 		// turn rainbow mode on or off
-		if (key == '/') {
-			if (RAINBOW) {
-				RAINBOW = false;
-			} else {
-				RAINBOW = true;
-			}
-		}
+		if (key == '/') RAINBOW = !RAINBOW;
 
 		// increase or decrease trail length
 		if (key == '-' && TR_LEN > 4) {
@@ -546,23 +613,7 @@ public class Sketch extends PApplet {
 		}
 
 		// turn on waves/turn off image particles
-		if (key == 'w') {
-			if (WAVE) {
-				WAVE = false;
-			} else {
-				WAVE = true;
-			}
-		}
-
-		// turn on/off having particles respond to mouse location, only
-		// available in picture mode
-		if (key == 'm') {
-			if (MOUSE) {
-				MOUSE = false;
-			} else {
-				MOUSE = true;
-			}
-		}
+		if (key == 'w') WAVE = !WAVE;
 		
 		//press 'r' to start/stop recording
 		if (key == 'r') {
@@ -623,20 +674,10 @@ public class Sketch extends PApplet {
 		}	
 
 		// turn the springs on or off, if springs are off the particles will bounce off the walls
-		if (key == 'p') {
-			if (SPRNG) {
-				SPRNG = false;
-			    for (int i=0; i<LENGTH; i++) {
-			    	springs[i].turnOff();
-			    }
-			}
-			else {
-				SPRNG = true;
-				for (int i=0; i<LENGTH; i++) {
-			    	springs[i].turnOn();
-			    }
-			}
-		}	
+		if (key == 'p') toggleSprings();	
+		
+		// turn the force on the mouse on or off
+		if (key == 'm') toggleMouse();
 	}
 
 	float distance(float x1, float y1, float x2, float y2) {
@@ -712,6 +753,8 @@ public class Sketch extends PApplet {
 		return res;
 	}
 	
+	
+	// This describes the force that the white, independent particles exert
 	public class MyAttraction implements Force
 	{
 		Particle a;

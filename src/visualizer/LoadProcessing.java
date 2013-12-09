@@ -23,6 +23,10 @@ import net.coobird.thumbnailator.Thumbnails;
 public class LoadProcessing {
 	JFrame welcomeFrame;
 	JButton nextButton;
+
+    int diffW, diffH, newDiffW, newDiffH;
+    boolean adjustX = false;
+    float ratio;
 	
 	public static int[] getPixelRGB(int pixel) {
 	    int red = (pixel >> 16) & 0xff;
@@ -38,6 +42,9 @@ public class LoadProcessing {
 	}
 	
 	public void getEdges(String filename, String nameExt, int index, File[] files, float lowThres, float highThres) throws IOException {
+        // Get size of the screen
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		
 		// Get the image
 		BufferedImage image = ImageIO.read( new File( filename ) );
 			
@@ -54,6 +61,9 @@ public class LoadProcessing {
 	}
 	
 	public void loadProcessing(String filename, String nameExt, int index, File[] files, float lowThres, float highThres) throws IOException {
+		
+        // Get size of the screen
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		
 		// Get the image
 		BufferedImage image = ImageIO.read( new File( filename ) );
@@ -72,11 +82,37 @@ public class LoadProcessing {
     	System.out.println(startW);
     	System.out.println(startH);
     	float ratio = 1;
+
+    	// Difference in image vs screen size
+    	diffW = dim.width - startW;
+       diffH = dim.height - startH;
+       
+       // Creates ratio to scale the image up or down
+       if (diffW < diffH) {
+         ratio = dim.width/startW;
+       }
+       else {
+         ratio = dim.height/startH;
+       }   	
+    	
     	System.out.println(ratio);
     	int newW = Math.round(startW * ratio);
     	int newH = Math.round(startH * ratio);
     	System.out.println(newW);
     	System.out.println(newH);
+    	
+        newDiffW = dim.width - newW;
+              newDiffH = dim.height - newH;
+              
+              if (newDiffW > newDiffH) {
+                adjustX = true;
+                newDiffW /= 2;
+              }
+              else {
+                newDiffH /= 2;
+              }
+    	
+    	
     	
     	// attempted cropping that's currently not doing anything
     	// TODO set up cropping/resizing
@@ -100,19 +136,29 @@ public class LoadProcessing {
     	        	int[] pixArray = getPixelRGB(colorPix);
     	        	String tup = "(" + pixArray[0] + ", " + pixArray[1] + ", " +
     	        			pixArray[2] + ")";
-    	        	String coord = i + " " + j + " " + tup;
+    	        	
+    	            String coord = "";
+    	                            // Move image horizontally to the center
+    	                            if (adjustX) {
+    	                                coord = (i + newDiffW) + " " + j + " " + tup;                  
+    	                            }
+    	                            // Move image vertically to the center
+    	                            else {
+    	                              coord = i + " " + (j + newDiffH) + " " + tup;
+    	                            }
     	        	out.println(coord);
     	        }
     	    }
     	out.close();
     	
-    	//new DisplayFrame().setVisible(true);
-    	
     	if (index < (files.length - 1)) {
     		EdgeDetectFlow walkthrough = new EdgeDetectFlow(files[index + 1].getAbsolutePath(), Integer.toString(index + 1), index + 1, files);
 			walkthrough.determineEdgeDetect(Integer.toString(index + 1));
     	} else {
-    		new DisplayFrame().setVisible(true);
+    		
+			// MAYBE THE SOLUTION
+			processing.core.PApplet sketch = new Sketch();
+	        processing.core.PApplet.main(new String[] {"--present", "visualizer.Sketch"});
     	}
 	}
 }

@@ -195,7 +195,7 @@ public class EdgeDetectFlow implements ActionListener {
 		    	edgeFrame.dispose();
 		    	try {
 		    		LoadProcessing createDots = new LoadProcessing();
-		    		createDots.loadProcessing(filename, nameExt, index, files, lowThres, highThres);	 
+		    		createDots.loadProcessing(filename, nameExt, index, files, lowThres, highThres);	
 		    	} catch (IOException e1) {
 		    		 // TODO Auto-generated catch block
 		    		e1.printStackTrace();

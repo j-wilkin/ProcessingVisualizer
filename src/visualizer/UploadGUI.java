@@ -68,8 +68,31 @@ public class UploadGUI implements ActionListener {
     	System.out.println(files.length);
     	numFiles = files.length;
     	System.out.println(numFiles);
+
 		EdgeDetectFlow walkthrough = new EdgeDetectFlow(files[0].getAbsolutePath(), Integer.toString(0), 0, files);
 		walkthrough.determineEdgeDetect(Integer.toString(0)); 	
+
+		//try
+		//{
+			// for loop for loadProcessing
+		//	for (int i = 0; i < numFiles; i++) {
+		//		Main.loadProcessing(files[i].getAbsolutePath(), Integer.toString(i));
+		//	}
+			//EdgeDetectionFlow();
+			//Main.loadProcessing(fname, numImage);
+			
+			// MAYBE THE SOLUTION
+			//processing.core.PApplet sketch = new Sketch();
+	        //processing.core.PApplet.main(new String[] {"--present", "visualizer.Sketch"});
+			//new FullScreenTest().main();
+			//new DisplayFrame().setVisible(true);
+			//new DisplayFrame();
+		//}
+		//catch(IOException e)
+		//{
+		//	System.exit(0);
+		//}
+    	
     }
     
     public void imagePreviews() {

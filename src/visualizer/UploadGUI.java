@@ -27,6 +27,7 @@ import org.monte.screenrecorder.ScreenRecorder;
 public class UploadGUI implements ActionListener {
 	JFrame welcomeFrame;
 	JButton nextButton;
+	JButton useDefault;
 	JButton recordButton;
 	JButton stopButton;
 	static int numFiles = 0;
@@ -70,8 +71,8 @@ public class UploadGUI implements ActionListener {
     	System.out.println(numFiles);
  
     	// TODO allow user to not upload a file and use presets
-		EdgeDetectFlow walkthrough = new EdgeDetectFlow(files[0].getAbsolutePath(), Integer.toString(0), 0, files);
-		walkthrough.determineEdgeDetect(Integer.toString(0)); 	
+    	EdgeDetectFlow walkthrough = new EdgeDetectFlow(files[0].getAbsolutePath(), Integer.toString(0), 0, files);
+    	walkthrough.determineEdgeDetect(Integer.toString(0)); 	
     }
     
     public void imagePreviews() {
@@ -112,23 +113,29 @@ public class UploadGUI implements ActionListener {
     	
     	//entireGUI.add(bluePanel);
     	
-    	nextButton = new JButton("Next");
-    	nextButton.setLocation(200, 350);
-    	nextButton.setSize(100, 50);
+    	nextButton = new JButton("Upload Images");
+    	nextButton.setLocation(300, 350);
+    	nextButton.setSize(150, 50);
     	nextButton.addActionListener(this);
     	buttonPanel.add(nextButton);
     	
-    	recordButton = new JButton("Record");
-    	recordButton.setLocation(200, 275);
-    	recordButton.setSize(100, 50);
-    	recordButton.addActionListener(this);
-    	buttonPanel.add(recordButton);
+    	useDefault = new JButton("Use Default");
+    	useDefault.setLocation(50, 350);
+    	useDefault.setSize(150, 50);
+    	useDefault.addActionListener(this);
+    	buttonPanel.add(useDefault);
     	
-    	stopButton =  new JButton("Stop");
-    	stopButton.setLocation(200, 200);
-    	stopButton.setSize(100, 50);
-    	stopButton.addActionListener(this);
-    	buttonPanel.add(stopButton);
+    	//recordButton = new JButton("Record");
+    	//recordButton.setLocation(200, 275);
+    	//recordButton.setSize(100, 50);
+    	//recordButton.addActionListener(this);
+    	//buttonPanel.add(recordButton);
+    	
+    	//stopButton =  new JButton("Stop");
+    	//stopButton.setLocation(200, 200);
+    	//stopButton.setSize(100, 50);
+    	//stopButton.addActionListener(this);
+    	//buttonPanel.add(stopButton);
     	
     	//content panes must be opaque
     	entireGUI.setOpaque(true);
@@ -150,6 +157,14 @@ public class UploadGUI implements ActionListener {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+    	}
+    	else if(e.getSource() == useDefault)
+    	{
+    		//also could use .dispose()... unsure which atm
+    		//welcomeFrame.setVisible(false);
+    		welcomeFrame.dispose();
+	    	LoadProcessing useDefaultImages = new LoadProcessing();
+	    	useDefaultImages.useDefaultImages();
     	}
     	else if(e.getSource() == recordButton){
     	
@@ -199,8 +214,6 @@ public class UploadGUI implements ActionListener {
  
 	    //Call the start method of ScreenRecorder to begin recording
 	    screenRecorder.start();
-	    
-    	
     	
     }
     

@@ -112,8 +112,6 @@ public class LoadProcessing {
                 newDiffH /= 2;
               }
     	
-    	
-    	
     	// attempted cropping that's currently not doing anything
     	// TODO set up cropping/resizing
     	BufferedImage thumb = Thumbnails.of(edges).size(newW, newH).asBufferedImage();
@@ -155,10 +153,14 @@ public class LoadProcessing {
     		EdgeDetectFlow walkthrough = new EdgeDetectFlow(files[index + 1].getAbsolutePath(), Integer.toString(index + 1), index + 1, files);
 			walkthrough.determineEdgeDetect(Integer.toString(index + 1));
     	} else {
-    		
 			// MAYBE THE SOLUTION
 			processing.core.PApplet sketch = new Sketch();
 	        processing.core.PApplet.main(new String[] {"--present", "visualizer.Sketch"});
     	}
+	}
+	
+	public void useDefaultImages() {
+		processing.core.PApplet sketch = new Sketch();
+        processing.core.PApplet.main(new String[] {"--present", "visualizer.Sketch"});
 	}
 }

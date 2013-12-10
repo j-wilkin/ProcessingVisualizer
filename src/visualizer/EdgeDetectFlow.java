@@ -33,8 +33,8 @@ public class EdgeDetectFlow implements ActionListener {
 	String edgeDetectValue;
 	int edgeLowThres;
 	int edgeHighThres;
-	JSlider edgeLowSlider = new JSlider(JSlider.HORIZONTAL, 0, 10, 5);
-	JSlider edgeHighSlider = new JSlider(JSlider.HORIZONTAL, 0, 10, 5);
+	JSlider edgeLowSlider = new JSlider(JSlider.HORIZONTAL, 0, 20, 10);
+	JSlider edgeHighSlider = new JSlider(JSlider.HORIZONTAL, 0, 20, 10);
 	
 	public EdgeDetectFlow(String file, String ext, int i, File[] fileList) {
 		filename = file;
@@ -45,7 +45,7 @@ public class EdgeDetectFlow implements ActionListener {
 
 	// will return an int (or a file?)
 	public void determineEdgeDetect(String num) {
-		edgeFrame = new JFrame("EDGE DETECT WOO " + num);
+		edgeFrame = new JFrame("Edge Detection for Image #" + Integer.toString(index + 1));
     	
         edgeFrame.setSize(500, 800); //The window Dimensions
         edgeFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -84,7 +84,7 @@ public class EdgeDetectFlow implements ActionListener {
 	   	buttonPanel.setSize(500, 800);
 	   	entireGUI.add(buttonPanel);
 	   	
-	   	JLabel welcomeText = new JLabel("Set Edge Detection for Image " + num);
+	   	JLabel welcomeText = new JLabel("Set Edge Detection for Image #" + Integer.toString(index+1));
 	   	welcomeText.setLocation(0, 0);
 	   	welcomeText.setSize(500, 100);
 	   	welcomeText.setHorizontalAlignment(0);
@@ -99,13 +99,13 @@ public class EdgeDetectFlow implements ActionListener {
 	    textPanel.add(edgeLabel);
 
 	    //Turn on labels at major tick marks.
-	    edgeLowSlider.setMajorTickSpacing(10);
-	    edgeLowSlider.setMinorTickSpacing(1);
+	    edgeLowSlider.setMajorTickSpacing(20);
+	    edgeLowSlider.setMinorTickSpacing(2);
 	    edgeLowSlider.setPaintTicks(true);
 	    edgeLowSlider.setPaintLabels(true);
 	    
-	    edgeLowSlider.setLocation(0, 200);
-	    edgeLowSlider.setSize(100, 100);
+	    edgeLowSlider.setLocation(150, 200);
+	    edgeLowSlider.setSize(200, 100);
 	    textPanel.add(edgeLowSlider);
 	    
         edgeLabel2 = new javax.swing.JLabel();
@@ -117,13 +117,13 @@ public class EdgeDetectFlow implements ActionListener {
 	    textPanel.add(edgeLabel2);
 
 	    //Turn on labels at major tick marks.
-	    edgeHighSlider.setMajorTickSpacing(10);
-	    edgeHighSlider.setMinorTickSpacing(1);
+	    edgeHighSlider.setMajorTickSpacing(20);
+	    edgeHighSlider.setMinorTickSpacing(2);
 	    edgeHighSlider.setPaintTicks(true);
 	    edgeHighSlider.setPaintLabels(true);
 	    
-	    edgeHighSlider.setLocation(0, 400);
-	    edgeHighSlider.setSize(100, 100);
+	    edgeHighSlider.setLocation(150, 400);
+	    edgeHighSlider.setSize(200, 100);
 	    textPanel.add(edgeHighSlider);
 	    
 	    previewButton = new JButton("Preview");
@@ -154,6 +154,9 @@ public class EdgeDetectFlow implements ActionListener {
 			float highThres = edgeHighThres * 1.0f;
 		    if (lowThres > highThres) {
 		    	JOptionPane.showMessageDialog(edgeFrame, "The low threshold needs to be lower than the high threshold!", "Try again", JOptionPane.ERROR_MESSAGE);
+			} 
+		    else if (lowThres == 0 | highThres == 0) {
+		    	JOptionPane.showMessageDialog(edgeFrame, "The thresholds must be greater than 0!", "Try again", JOptionPane.ERROR_MESSAGE);
 			} else {
 		    	try {
 		    		LoadProcessing createEdgePreview = new LoadProcessing();
@@ -191,6 +194,8 @@ public class EdgeDetectFlow implements ActionListener {
 			float highThres = edgeHighThres * 1.0f;
 		    if (lowThres > highThres) {
 		    	JOptionPane.showMessageDialog(edgeFrame, "The low threshold needs to be lower than the high threshold!", "Try again", JOptionPane.ERROR_MESSAGE);
+			} else if (lowThres == 0 | highThres == 0) {
+		    	JOptionPane.showMessageDialog(edgeFrame, "The thresholds must be greater than 0!", "Try again", JOptionPane.ERROR_MESSAGE);
 			} else {
 		    	edgeFrame.dispose();
 		    	try {

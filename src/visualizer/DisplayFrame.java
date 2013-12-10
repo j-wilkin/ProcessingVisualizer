@@ -9,7 +9,7 @@ public class DisplayFrame extends javax.swing.JFrame {
         // Get size of the screen
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setSize(dim.width, dim.height);
-        //this.setSize(1080, 720);
+
     	// Determine the new location of the window
         int w = this.getSize().width;
         int h = this.getSize().height;
@@ -22,6 +22,10 @@ public class DisplayFrame extends javax.swing.JFrame {
         // this.setContentPane(panel);
         // panel.setBounds(0, 0, 50, 50);
 
+        
+        // TODO Center the image in the window
+        // TODO Figure out cropping (maybe here maybe in LoadProc)
+        
         this.setLocation(0, 0);
         // Fix and move to center
         //this.setLocation((1080-w)/2, (720-h)/2);

@@ -32,7 +32,7 @@ public class Sketch extends PApplet {
 
 	int NTH_PARTICLE = 7;
 	int[] PARTICLE_COLOR;
-	boolean TRAIL = true;
+	boolean TRAIL = false;
 	int TR_LEN = 90;
 	boolean RAINBOW = false;
 	boolean DGRAV, UGRAV, LGRAV, RGRAV = false;
@@ -90,7 +90,7 @@ public class Sketch extends PApplet {
 			}
 			
 		// Toggles
-		else if (channel == 1 && value == 1)
+		else if (channel == 1)
 			switch (number) {
 				case 10: TRAIL = !TRAIL;
 					break;
@@ -101,10 +101,6 @@ public class Sketch extends PApplet {
 				case 13: WAVE = !WAVE;
 					break;
 				case 14: toggleForceParticles();
-					break;
-				case 15: toggleDownwardGravity();
-					break;
-				case 16: toggleUpwardGravity();
 					break;
 			}
 		
@@ -125,6 +121,30 @@ public class Sketch extends PApplet {
 					break;
 				case 106: transitionImg("6");
 					break;
+			}
+		
+		else if (channel == 3 && value == 1)
+			switch(number) {
+			case 3: toggleDownwardGravity();
+				break;
+			case 1: toggleUpwardGravity();
+				break;
+			case 4: toggleLeftGravity();
+			 	break;
+			case 2: toggleRightGravity();
+				break;
+			case 5: toggleNoGravity();
+				break;	
+			case 6: toggleULGravity();
+				break;
+			case 7: toggleURGravity();
+				break;
+			case 8: toggleDRGravity();
+			 	break;
+			case 9: toggleDLGravity();
+				break;
+			
+			
 			}
 		 
 	}
@@ -150,70 +170,44 @@ public class Sketch extends PApplet {
 		}
 	}
 	
+	public void toggleNoGravity(){
+		physics.setGravity(0);
+	}
 	
 	public void toggleUpwardGravity(){
-		if (UGRAV) {
-			UGRAV = false;
-			if (LGRAV) physics.setGravity(-2, 0, 0);
-			else if (RGRAV) physics.setGravity(2, 0, 0);
-			else physics.setGravity(0);
-		}
-		else {
-			UGRAV = true;
-			DGRAV = false;
-			if (LGRAV) physics.setGravity(-2, -2, 0);
-			else if (RGRAV) physics.setGravity(2, -2, 0);
-			else physics.setGravity(-2);
-		}
+		physics.setGravity(-2);
 	}
 	
 	public void toggleDownwardGravity(){
-		if (DGRAV) {
-			DGRAV = false;
-			if (LGRAV) physics.setGravity(-2, 0, 0);
-			else if (RGRAV) physics.setGravity(2, 0, 0);
-			else physics.setGravity(0);
-		}
-		else {
-			DGRAV = true;
-			UGRAV = false;
-			if (LGRAV) physics.setGravity(-2, 2, 0);
-			else if (RGRAV) physics.setGravity(2, 2, 0);
-			else physics.setGravity(2);
-		}
+		physics.setGravity(2);
+
 	}
 	
 	public void toggleLeftGravity(){
-		if (LGRAV) {
-			LGRAV = false;
-			if (DGRAV) physics.setGravity(0, 2, 0);
-			else if (UGRAV) physics.setGravity(0, -2, 0);
-			else physics.setGravity(0);
-		}
-		else {
-			LGRAV = true;
-			RGRAV = false;
-			if (DGRAV) physics.setGravity(-2, 2, 0);
-			else if (UGRAV) physics.setGravity(-2, -2, 0);
-			else physics.setGravity(-2, 0, 0);
-		}
+		physics.setGravity(-2, 0, 0);
 	}
 	
 	public void toggleRightGravity(){
-		if (RGRAV) {
-			RGRAV = false;
-			if (DGRAV) physics.setGravity(0, 2, 0);
-			else if (UGRAV) physics.setGravity(0, -2, 0);
-			else physics.setGravity(0);
-		}
-		else {
-			RGRAV = true;
-			LGRAV = false;
-			if (DGRAV) physics.setGravity(2, 2, 0);
-			else if (UGRAV) physics.setGravity(2, -2, 0);
-			else physics.setGravity(2, 0, 0);
-		}
+		physics.setGravity(2, 0, 0);
 	}
+	
+	public void toggleULGravity(){
+		physics.setGravity(-2, -2, 0);
+	}
+	
+	public void toggleDLGravity(){
+		physics.setGravity(-2, 2, 0);
+
+	}
+	
+	public void toggleURGravity(){
+		physics.setGravity(2, -2, 0);
+	}
+	
+	public void toggleDRGravity(){
+		physics.setGravity(2, 2, 0);
+	}
+	
 	
 	public void toggleSprings() {
 		if (SPRNG) {

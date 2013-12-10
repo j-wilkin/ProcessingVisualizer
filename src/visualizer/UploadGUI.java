@@ -23,6 +23,7 @@ import org.monte.media.FormatKeys.MediaType;
 import org.monte.media.math.Rational;
 import org.monte.screenrecorder.ScreenRecorder;
 
+import themidibus.MidiBus;
 
 public class UploadGUI implements ActionListener {
 	JFrame welcomeFrame;
@@ -32,9 +33,11 @@ public class UploadGUI implements ActionListener {
 	JButton stopButton;
 	static int numFiles = 0;
 	ScreenRecorder screenRecorder;
+	boolean recording = false;
 	
 	// Welcome window
-    public UploadGUI(){
+    @SuppressWarnings("unused")
+	public UploadGUI(){
     	
     	welcomeFrame = new JFrame("Welcome to our app!");
     	
@@ -56,10 +59,48 @@ public class UploadGUI implements ActionListener {
         welcomeFrame.setContentPane(createContentPane());
 
         welcomeFrame.setVisible(true);
+        
+        MidiBus.list();
+		MidiBus guiBus = new MidiBus(this, 0, 0);
     }
     
-    public void fileUpload() throws AWTException, IOException {
-    	
+
+    public void controllerChange(int channel, int number, int value){
+    	System.out.println("Channel: " + channel);
+    	System.out.println("Number: "+number);
+    	System.out.println("Value: "+value);
+	
+		if (channel == 1 && number == 17){
+			if (!recording){
+				System.out.println("Recording now!!!");
+				try {
+					beginRecord();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (AWTException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				recording = true;
+			}
+			else{
+				System.out.println("Encoding now!!!");
+	    		try {
+					screenRecorder.stop();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	    		recording = false;
+			}
+		}
+			
+		
+    }
+    
+
+    public void fileUpload() throws AWTException, IOException {    	
     	JFileChooser chooser = new JFileChooser();
     	chooser.setMultiSelectionEnabled(true);
 		chooser.showOpenDialog(welcomeFrame);
@@ -69,7 +110,7 @@ public class UploadGUI implements ActionListener {
     	System.out.println(files.length);
     	numFiles = files.length;
     	System.out.println(numFiles);
- 
+
     	// TODO allow user to not upload a file and use presets
     	EdgeDetectFlow walkthrough = new EdgeDetectFlow(files[0].getAbsolutePath(), Integer.toString(0), 0, files);
     	walkthrough.determineEdgeDetect(Integer.toString(0)); 	
@@ -100,7 +141,7 @@ public class UploadGUI implements ActionListener {
     	buttonPanel.setSize(500, 500);
     	entireGUI.add(buttonPanel);
     	
-    	JLabel welcomeText = new JLabel("Welcome to our Processing App (Beta)");
+    	JLabel welcomeText = new JLabel("Processing Visualizer");
     	JLabel welcomeText2 = new JLabel("Please click next to continue...");
     	welcomeText.setLocation(0, 0);
     	welcomeText.setSize(500, 100);
@@ -118,25 +159,13 @@ public class UploadGUI implements ActionListener {
     	nextButton.setSize(150, 50);
     	nextButton.addActionListener(this);
     	buttonPanel.add(nextButton);
-    	
+
     	useDefault = new JButton("Use Default");
     	useDefault.setLocation(50, 350);
     	useDefault.setSize(150, 50);
     	useDefault.addActionListener(this);
     	buttonPanel.add(useDefault);
-    	
-    	//recordButton = new JButton("Record");
-    	//recordButton.setLocation(200, 275);
-    	//recordButton.setSize(100, 50);
-    	//recordButton.addActionListener(this);
-    	//buttonPanel.add(recordButton);
-    	
-    	//stopButton =  new JButton("Stop");
-    	//stopButton.setLocation(200, 200);
-    	//stopButton.setSize(100, 50);
-    	//stopButton.addActionListener(this);
-    	//buttonPanel.add(stopButton);
-    	
+   	
     	//content panes must be opaque
     	entireGUI.setOpaque(true);
     	return entireGUI;
@@ -157,36 +186,12 @@ public class UploadGUI implements ActionListener {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-    	}
-    	else if(e.getSource() == useDefault)
-    	{
+    	} else if(e.getSource() == useDefault) {
     		//also could use .dispose()... unsure which atm
     		//welcomeFrame.setVisible(false);
     		welcomeFrame.dispose();
 	    	LoadProcessing useDefaultImages = new LoadProcessing();
 	    	useDefaultImages.useDefaultImages();
-    	}
-    	else if(e.getSource() == recordButton){
-    	
-					try {
-						beginRecord();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (AWTException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-
-    	}
-    	else if(e.getSource() == stopButton){
-    		try {
-				screenRecorder.stop();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-    		
     	}
     }
     

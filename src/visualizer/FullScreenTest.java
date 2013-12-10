@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 /** @see http://stackoverflow.com/questions/7456227 */
+@SuppressWarnings({ "unused", "serial" })
 public class FullScreenTest extends JPanel {
 
     private static final String EXIT = "Exit";

@@ -20,6 +20,7 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
+@SuppressWarnings("unused")
 public class EdgeDetectFlow implements ActionListener {
 	String filename;
 	String nameExt;

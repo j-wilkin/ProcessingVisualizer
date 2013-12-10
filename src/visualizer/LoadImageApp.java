@@ -42,6 +42,7 @@ import javax.swing.*;
 /**
  * This class demonstrates how to load an Image from an external file
  */
+@SuppressWarnings({ "unused", "serial" })
 public class LoadImageApp extends Component {
            
     BufferedImage img;

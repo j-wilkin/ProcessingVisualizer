@@ -20,6 +20,7 @@ import javax.swing.WindowConstants;
 
 import net.coobird.thumbnailator.Thumbnails;
 
+@SuppressWarnings("unused")
 public class LoadProcessing {
 	JFrame welcomeFrame;
 	JButton nextButton;
@@ -158,9 +159,10 @@ public class LoadProcessing {
 	        processing.core.PApplet.main(new String[] {"--present", "visualizer.Sketch"});
     	}
 	}
-	
+
 	public void useDefaultImages() {
 		processing.core.PApplet sketch = new Sketch();
         processing.core.PApplet.main(new String[] {"--present", "visualizer.Sketch"});
 	}
 }
+

@@ -329,7 +329,7 @@ public class Sketch extends PApplet {
 	
 	public void setup() {
 		
-		frame.setBackground(new Color(255,0,0));
+		frame.setBackground(new Color(0,0,0));
 		size(displayWidth, displayHeight);
 		noCursor();
 		// set up an array to hold the time stamps for each frame
@@ -339,7 +339,7 @@ public class Sketch extends PApplet {
 		setImage("0");
 		// precautionary measure to make sure there's no ghost force particles at setup
 		toggleForceParticles();
-		frameRate(30);
+		frameRate(60);
 		MidiBus.list();
 		MidiBus myBus = new MidiBus(this, 0, 0);
 		

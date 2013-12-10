@@ -18,6 +18,7 @@ import javax.swing.WindowConstants;
 
 import net.coobird.thumbnailator.Thumbnails;
 
+@SuppressWarnings("unused")
 public class LoadProcessing {
 	JButton nextButton;
 	

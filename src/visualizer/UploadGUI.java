@@ -23,6 +23,7 @@ import org.monte.media.FormatKeys.MediaType;
 import org.monte.media.math.Rational;
 import org.monte.screenrecorder.ScreenRecorder;
 
+import themidibus.MidiBus;
 
 public class UploadGUI implements ActionListener {
 	JFrame welcomeFrame;
@@ -31,9 +32,11 @@ public class UploadGUI implements ActionListener {
 	JButton stopButton;
 	static int numFiles = 0;
 	ScreenRecorder screenRecorder;
+	boolean recording = false;
 	
 	// Welcome window
-    public UploadGUI(){
+    @SuppressWarnings("unused")
+	public UploadGUI(){
     	
     	welcomeFrame = new JFrame("Welcome to our app!");
     	
@@ -55,9 +58,47 @@ public class UploadGUI implements ActionListener {
         welcomeFrame.setContentPane(createContentPane());
 
         welcomeFrame.setVisible(true);
+        
+        MidiBus.list();
+		MidiBus guiBus = new MidiBus(this, 0, 0);
     }
     
-    public void fileUpload() throws AWTException {
+
+    public void controllerChange(int channel, int number, int value){
+    	System.out.println("Channel: " + channel);
+    	System.out.println("Number: "+number);
+    	System.out.println("Value: "+value);
+	
+		if (channel == 1 && number == 17){
+			if (!recording){
+				System.out.println("Recording now!!!");
+				try {
+					beginRecord();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (AWTException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				recording = true;
+			}
+			else{
+				System.out.println("Encoding now!!!");
+	    		try {
+					screenRecorder.stop();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	    		recording = false;
+			}
+		}
+			
+		
+    }
+    
+	public void fileUpload() throws AWTException {
     	
     	JFileChooser chooser = new JFileChooser();
     	chooser.setMultiSelectionEnabled(true);
@@ -76,7 +117,7 @@ public class UploadGUI implements ActionListener {
 			//Main.loadProcessing(fname, numImage);
 			
 			// MAYBE THE SOLUTION
-			processing.core.PApplet sketch = new Sketch();
+			//processing.core.PApplet sketch = new Sketch();
 	        processing.core.PApplet.main(new String[] {"--present", "visualizer.Sketch"});
 			//new FullScreenTest().main();
 			//new DisplayFrame().setVisible(true);
@@ -113,7 +154,7 @@ public class UploadGUI implements ActionListener {
     	buttonPanel.setSize(500, 500);
     	entireGUI.add(buttonPanel);
     	
-    	JLabel welcomeText = new JLabel("Welcome to our Processing App (Beta)");
+    	JLabel welcomeText = new JLabel("Processing Visualizer");
     	JLabel welcomeText2 = new JLabel("Please click next to continue...");
     	welcomeText.setLocation(0, 0);
     	welcomeText.setSize(500, 100);
@@ -132,17 +173,6 @@ public class UploadGUI implements ActionListener {
     	nextButton.addActionListener(this);
     	buttonPanel.add(nextButton);
     	
-    	recordButton = new JButton("Record");
-    	recordButton.setLocation(200, 275);
-    	recordButton.setSize(100, 50);
-    	recordButton.addActionListener(this);
-    	buttonPanel.add(recordButton);
-    	
-    	stopButton =  new JButton("Stop");
-    	stopButton.setLocation(200, 200);
-    	stopButton.setSize(100, 50);
-    	stopButton.addActionListener(this);
-    	buttonPanel.add(stopButton);
     	
     	//content panes must be opaque
     	entireGUI.setOpaque(true);
@@ -162,28 +192,6 @@ public class UploadGUI implements ActionListener {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-    	}
-    	else if(e.getSource() == recordButton){
-    	
-					try {
-						beginRecord();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (AWTException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-
-    	}
-    	else if(e.getSource() == stopButton){
-    		try {
-				screenRecorder.stop();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-    		
     	}
     }
     

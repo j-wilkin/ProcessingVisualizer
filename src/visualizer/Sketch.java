@@ -35,6 +35,7 @@ public class Sketch extends PApplet {
 	boolean TRAIL = false;
 	int TR_LEN = 90;
 	boolean RAINBOW = false;
+	boolean MOUSE = true;
 	boolean DGRAV, UGRAV, LGRAV, RGRAV = false;
 	
 	boolean FADEOUT = false;
@@ -219,6 +220,21 @@ public class Sketch extends PApplet {
 			SPRNG = true;
 			for (int i=0; i<LENGTH; i++) {
 		    	springs[i].turnOn();
+		    }
+		}	
+	}
+	
+	public void toggleMouse() {
+		if (MOUSE) {
+			MOUSE = false;
+		    for (int i=0; i<LENGTH; i++) {
+		    	mouseForces[i].turnOff();
+		    }
+		}
+		else {
+			MOUSE = true;
+			for (int i=0; i<LENGTH; i++) {
+		    	mouseForces[i].turnOn();
 		    }
 		}	
 	}
@@ -529,10 +545,10 @@ public class Sketch extends PApplet {
 		// If the user presses up on the keyboard, fewer particles will be drawn
 		// and vice versa
 		if (key == CODED) {
-			if (keyCode == UP && NTH_PARTICLE < 25) {
+			if (keyCode == DOWN && NTH_PARTICLE < 25) {
 				// arbitrary cap on how much the particles are decreased by
 				NTH_PARTICLE++;
-			} else if (keyCode == DOWN && NTH_PARTICLE > 1) {
+			} else if (keyCode == UP && NTH_PARTICLE > 1) {
 				// avoiding math issues
 				NTH_PARTICLE--;
 			}
@@ -641,6 +657,9 @@ public class Sketch extends PApplet {
 
 		// turn the springs on or off, if springs are off the particles will bounce off the walls
 		if (key == 'p') toggleSprings();	
+		
+		// turn mouse forces on or off
+		if (key == 'm') toggleMouse();
 	}
 
 	float distance(float x1, float y1, float x2, float y2) {

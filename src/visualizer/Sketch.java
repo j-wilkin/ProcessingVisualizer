@@ -314,6 +314,13 @@ public class Sketch extends PApplet {
 		noStroke();
 		ellipseMode(CENTER);
 		smooth();
+		
+		// Prevent ghost force particles in the beginning.
+		ATTR = true;
+		toggleForceParticles();
+		
+		// Mouse always starts on.
+		MOUSE = true;
 	}
 	
 	public void transitionImg(String extension){
@@ -331,7 +338,6 @@ public class Sketch extends PApplet {
 		// GRABS THE LOCATIONS OF PARTICLES FROM THE EDGE-DETECTED PICTURE
 		setImage("0");
 		// precautionary measure to make sure there's no ghost force particles at setup
-		toggleForceParticles();
 		frameRate(60);
 		MidiBus.list();
 		MidiBus myBus = new MidiBus(this, 0, 0);
@@ -587,10 +593,10 @@ public class Sketch extends PApplet {
 		if (key == '/') RAINBOW = !RAINBOW;
 
 		// increase or decrease trail length
-		if (key == '-' && TR_LEN > 4) {
+		if (key == '=' && TR_LEN > 4) {
 			TR_LEN -= 5;
 		}
-		if (key == '=' && TR_LEN < 251) {
+		if (key == '-' && TR_LEN < 251) {
 			TR_LEN += 5;
 		}
 

@@ -63,8 +63,8 @@ public class LoadProcessing {
 	
 	public void loadProcessing(String filename, String nameExt, int index, File[] files, float lowThres, float highThres) throws IOException {
 		
-        // Get size of the screen
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		// Get size of the screen
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		
 		// Get the image
 		BufferedImage image = ImageIO.read( new File( filename ) );
@@ -86,15 +86,15 @@ public class LoadProcessing {
 
     	// Difference in image vs screen size
     	diffW = dim.width - startW;
-       diffH = dim.height - startH;
+    	diffH = dim.height - startH;
        
-       // Creates ratio to scale the image up or down
-       if (diffW < diffH) {
-         ratio = dim.width/startW;
-       }
-       else {
-         ratio = dim.height/startH;
-       }   	
+    	// Creates ratio to scale the image up or down
+    	if (diffW < diffH) {
+    		ratio = dim.width/ (float) startW;
+    	}
+    	else {
+    		ratio = dim.height/ (float) startH;
+    	}   	
     	
     	System.out.println(ratio);
     	int newW = Math.round(startW * ratio);

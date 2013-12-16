@@ -30,40 +30,35 @@ package visualizer;
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.io.*;
 
-import javax.imageio.*;
-import javax.swing.*;
+import java.io.File;
+
+import javax.swing.filechooser.*;
  
-/**
- * This class demonstrates how to load an Image from an external file
- */
-@SuppressWarnings({ "unused", "serial" })
-public class LoadImageApp extends Component {
-           
-    BufferedImage img;
+/* ImageFilter.java is used by FileChooserDemo2.java. */
+public class ImageFilter extends FileFilter {
  
-    public void paint(Graphics g) {
-        g.drawImage(img, 0, 0, null);
+    //Accept all directories and all jpg or tiff files.
+    public boolean accept(File f) {
+        if (f.isDirectory()) {
+            return true;
+        }
+ 
+        String extension = Utils.getExtension(f);
+        if (extension != null) {
+            if (extension.equals(Utils.jpeg) ||
+                extension.equals(Utils.jpg)) {
+                    return true;
+            } else {
+                return false;
+            }
+        }
+ 
+        return false;
     }
  
-    public LoadImageApp(String nameExt) {
-       try {
-           img = ImageIO.read(new File("image" + nameExt +".jpg"));
-       } catch (IOException e) {
-       }
- 
-    }
-
-	public Dimension getPreferredSize() {
-        if (img == null) {
-             return new Dimension(100,100);
-        } else {
-           return new Dimension(img.getWidth(null), img.getHeight(null));
-       }
+    //The description of this filter
+    public String getDescription() {
+        return "Just Images";
     }
 }

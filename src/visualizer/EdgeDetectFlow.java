@@ -1,5 +1,6 @@
 package visualizer;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -11,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,6 +22,8 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
+import net.coobird.thumbnailator.Thumbnails;
+
 @SuppressWarnings("unused")
 public class EdgeDetectFlow implements ActionListener {
 	String filename;
@@ -27,8 +31,12 @@ public class EdgeDetectFlow implements ActionListener {
 	int index;
 	File[] files;
 	JFrame edgeFrame;
+	JPanel textPanel;
+	JPanel picturePanel;
+	JPanel previewPanel;
 	JLabel edgeLabel;
 	JLabel edgeLabel2;
+	JLabel imageCont;
 	JButton progressButton;
 	JButton previewButton;
 	String edgeDetectValue;
@@ -36,7 +44,11 @@ public class EdgeDetectFlow implements ActionListener {
 	int edgeHighThres;
 	JSlider edgeLowSlider = new JSlider(JSlider.HORIZONTAL, 0, 20, 10);
 	JSlider edgeHighSlider = new JSlider(JSlider.HORIZONTAL, 0, 20, 10);
-	
+	BufferedImage origImage;
+    Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+    Component thumbnailImg;
+    Component thumbnailEdges;
+    
 	public EdgeDetectFlow(String file, String ext, int i, File[] fileList) {
 		filename = file;
 		nameExt = ext;
@@ -44,11 +56,11 @@ public class EdgeDetectFlow implements ActionListener {
 		files = fileList;
 	}
 
-	// will return an int (or a file?)
 	public void determineEdgeDetect(String num) {
 		edgeFrame = new JFrame("Edge Detection for Image #" + Integer.toString(index + 1));
     	
-        edgeFrame.setSize(500, 800); //The window Dimensions
+        //edgeFrame.setSize(500, 800); //The window Dimensions
+        edgeFrame.setSize(800, 600);
         edgeFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         
         // Get size of the screen
@@ -64,38 +76,88 @@ public class EdgeDetectFlow implements ActionListener {
         edgeFrame.setLocation(x, y);
         
         edgeFrame.setContentPane(createEdgeDetectPane(Integer.toString(index + 1)));
-
-        edgeFrame.setVisible(true);
-        
+        edgeFrame.setAlwaysOnTop(true);
+        edgeFrame.setVisible(true);       
 	}
 	
 	public JPanel createEdgeDetectPane(String num) {
 	   	JPanel entireGUI = new JPanel();
 	   	entireGUI.setLayout(null);
 	   	
-	   	JPanel textPanel = new JPanel();
+	   	textPanel = new JPanel();
 	   	textPanel.setLayout(null);
-	   	textPanel.setLocation(0, 0);
-	   	textPanel.setSize(500, 500);
+	   	textPanel.setLocation(400, 0);
+	   	textPanel.setSize(400, 400);
 	   	entireGUI.add(textPanel);
+	   	
+	   	picturePanel = new JPanel();
+	   	picturePanel.setLayout(null);
+	   	picturePanel.setLocation(0, 0);
+	   	picturePanel.setSize(400, 250);
+	   	entireGUI.add(picturePanel);
+	   	
+	   	previewPanel = new JPanel();
+	   	previewPanel.setLayout(null);
+	   	previewPanel.setLocation(0, 250);
+	   	previewPanel.setSize(400, 550);
+	   	entireGUI.add(previewPanel);
 	   	
 	   	JPanel buttonPanel = new JPanel();
 	   	buttonPanel.setLayout(null);
-	   	buttonPanel.setLocation(0,0);
-	   	buttonPanel.setSize(500, 800);
+	   	buttonPanel.setLocation(400,400);
+	   	buttonPanel.setSize(400, 250);
 	   	entireGUI.add(buttonPanel);
 	   	
 	   	JLabel welcomeText = new JLabel("Set Edge Detection for Image #" + Integer.toString(index+1));
 	   	welcomeText.setLocation(0, 0);
-	   	welcomeText.setSize(500, 100);
+	   	welcomeText.setSize(400, 50);
 	   	welcomeText.setHorizontalAlignment(0);
 	   	textPanel.add(welcomeText);
+	   	
+	   	//Insert image at 200 px tall
+	   	try{
+	   		origImage = ImageIO.read(new File(filename));
+	   		
+	   	    // print the dimensions of the photo
+	    	int startW = origImage.getWidth();
+	    	int startH = origImage.getHeight();
+	    	float ratio = 1;
+
+	    	// Difference in image vs previewbox
+	    	
+	    	int diffH = 200 - startH;
+	    	ratio = (float) (200.0/startH);
+	    	
+	    	System.out.println(ratio);
+	    	int newW = Math.round(startW * ratio);
+	    	int newH = Math.round(startH * ratio);
+	    	
+	    	// attempted cropping that's currently not doing anything
+	    	// TODO set up cropping/resizing
+	    	BufferedImage thumb = Thumbnails.of(origImage).size(newW, newH).asBufferedImage();
+	    	File outputfile = new File("thumb" + nameExt + ".jpg");
+	    	ImageIO.write(thumb, "jpg", outputfile);
+	    	
+	    	// TODO FIGURE OUT THIS WEIRD BUG
+	    	JFrame testFrame = new JFrame("temp");
+	    	testFrame.setSize(800, 650);
+	        testFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+	        thumbnailImg =  new LoadGenericImage(outputfile.getCanonicalPath());
+    	    testFrame.add(thumbnailImg);
+	        testFrame.setVisible(true);
+	        testFrame.dispose();
+	        thumbnailImg.setLocation(50, 25);
+	        picturePanel.add(thumbnailImg);
+	    	
+	    } catch (IOException e) {
+    		e.printStackTrace();
+	    }
 	   	
         edgeLabel = new javax.swing.JLabel();
         edgeLabel.setText("Edge Detect Low Threshold: ");
 	    	
-	    edgeLabel.setLocation(0, 100);
-	    edgeLabel.setSize(500, 100);
+	    edgeLabel.setLocation(0, 75);
+	    edgeLabel.setSize(400, 50);
 	    edgeLabel.setHorizontalAlignment(0);
 	    textPanel.add(edgeLabel);
 
@@ -105,15 +167,15 @@ public class EdgeDetectFlow implements ActionListener {
 	    edgeLowSlider.setPaintTicks(true);
 	    edgeLowSlider.setPaintLabels(true);
 	    
-	    edgeLowSlider.setLocation(150, 200);
+	    edgeLowSlider.setLocation(100, 150);
 	    edgeLowSlider.setSize(200, 100);
 	    textPanel.add(edgeLowSlider);
 	    
         edgeLabel2 = new javax.swing.JLabel();
         edgeLabel2.setText("Edge Detect High Threshold: ");
 	    	
-	    edgeLabel2.setLocation(0, 300);
-	    edgeLabel2.setSize(500, 100);
+	    edgeLabel2.setLocation(0, 250);
+	    edgeLabel2.setSize(400, 50);
 	    edgeLabel2.setHorizontalAlignment(0);
 	    textPanel.add(edgeLabel2);
 
@@ -123,18 +185,18 @@ public class EdgeDetectFlow implements ActionListener {
 	    edgeHighSlider.setPaintTicks(true);
 	    edgeHighSlider.setPaintLabels(true);
 	    
-	    edgeHighSlider.setLocation(150, 400);
+	    edgeHighSlider.setLocation(100, 300);
 	    edgeHighSlider.setSize(200, 100);
 	    textPanel.add(edgeHighSlider);
 	    
 	    previewButton = new JButton("Preview");
-	    previewButton.setLocation(100, 600);
+	    previewButton.setLocation(80, 0);
 	    previewButton.setSize(100, 50);
 	    previewButton.addActionListener(this);
 	    buttonPanel.add(previewButton);
 	    
-	    progressButton = new JButton("Next Pic");
-	    progressButton.setLocation(300, 600);
+	    progressButton = new JButton("Next");
+	    progressButton.setLocation(240, 0);
 	    progressButton.setSize(100, 50);
 	    progressButton.addActionListener(this);
 	    buttonPanel.add(progressButton);
@@ -162,24 +224,33 @@ public class EdgeDetectFlow implements ActionListener {
 		    	try {
 		    		LoadProcessing createEdgePreview = new LoadProcessing();
 		    		createEdgePreview.getEdges(filename, nameExt, index, files, lowThres, highThres);
-
-		    		JFrame f = new JFrame("Load Image Sample");
-		    		f.setAlwaysOnTop(true);
-		    	    f.add(new LoadImageApp(nameExt));
-		    	    f.pack();
 		    	    
-		            // Get size of the screen
-		            Dimension screendim = Toolkit.getDefaultToolkit().getScreenSize();
-		            
-		            // Determine the new location of the window
-		            int boxw = f.getSize().width;
-		            int boxh = f.getSize().height;
-		            int coordx = (screendim.width-boxw)/2;
-		            int coordy = (screendim.height-boxh)/2;
-		             
-		            // Move the window
-		            f.setLocation(coordx, coordy);
-		    	    f.setVisible(true);     
+		    	    // TODO FIGURE OUT THIS WEIRD BUG
+		    	    JFrame testFrame = new JFrame("temp2");
+			    	testFrame.setSize(800, 650);
+			        testFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+			        
+			        // Get size of the screen
+			        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+			        
+			        // Determine the new location of the window
+			        int w = testFrame.getSize().width;
+			        int h = testFrame.getSize().height;
+			        int x = (dim.width-w)/2;
+			        int y = (dim.height-h)/2;
+			         
+			        // Move the window
+			        testFrame.setLocation(x, y);
+			        
+			        thumbnailEdges =  new LoadGenericImage("thumbedges" + nameExt + ".jpg");
+		    	    testFrame.add(thumbnailEdges);
+			        testFrame.setVisible(true);
+			        testFrame.dispose();
+
+			        thumbnailEdges.setLocation(50, 0);
+			        previewPanel.removeAll();
+			        previewPanel.add(thumbnailEdges);
+			        	    	    
 		    	} catch (IOException e1) {
 		    		 // TODO Auto-generated catch block
 		    		e1.printStackTrace();

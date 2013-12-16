@@ -47,7 +47,7 @@ public class LoadProcessing {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		
 		// Get the image
-		BufferedImage image = ImageIO.read( new File( filename ) );
+		BufferedImage image = ImageIO.read( new File( "thumb" + index + ".jpg"  ) );
 			
 		// EDGE DETECTION
 		visualizer.CannyEdgeDetector detector = new visualizer.CannyEdgeDetector();
@@ -57,13 +57,13 @@ public class LoadProcessing {
 		detector.process();
 		BufferedImage edges = detector.getEdgesImage();
 
-		File outputfile = new File("image" + nameExt + ".jpg");
+		File outputfile = new File("thumbedges" + nameExt + ".jpg");
 		ImageIO.write(edges, "jpg", outputfile);
 	}
 	
 	public void loadProcessing(String filename, String nameExt, int index, File[] files, float lowThres, float highThres) throws IOException {
 		
-        // Get size of the screen
+		// Get size of the screen
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		
 		// Get the image
@@ -86,15 +86,15 @@ public class LoadProcessing {
 
     	// Difference in image vs screen size
     	diffW = dim.width - startW;
-       diffH = dim.height - startH;
+    	diffH = dim.height - startH;
        
-       // Creates ratio to scale the image up or down
-       if (diffW < diffH) {
-         ratio = dim.width/startW;
-       }
-       else {
-         ratio = dim.height/startH;
-       }   	
+    	// Creates ratio to scale the image up or down
+    	if (diffW < diffH) {
+    		ratio = dim.width/startW;
+    	}
+    	else {
+    		ratio = dim.height/startH;
+    	}   	
     	
     	System.out.println(ratio);
     	int newW = Math.round(startW * ratio);

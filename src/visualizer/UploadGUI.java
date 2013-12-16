@@ -13,9 +13,11 @@ import static org.monte.media.VideoFormatKeys.QualityKey;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import org.monte.media.Format;
@@ -94,28 +96,28 @@ public class UploadGUI implements ActionListener {
 				}
 	    		recording = false;
 			}
-		}
-			
-		
+		}	
     }
     
 
     public void fileUpload() throws AWTException, IOException {    	
     	JFileChooser chooser = new JFileChooser();
     	chooser.setMultiSelectionEnabled(true);
-		chooser.showOpenDialog(welcomeFrame);
+    	chooser.setFileFilter(new ImageFilter());
+    	chooser.setAcceptAllFileFilterUsed(false);
 		
-		// Check to make sure files are jpgs and not txt or anything else
-    	File[] files = chooser.getSelectedFiles();
-    	System.out.println(files.length);
-    	numFiles = files.length;
-    	System.out.println(numFiles);
-
-    	// TODO allow user to not upload a file and use presets
-    	EdgeDetectFlow walkthrough = new EdgeDetectFlow(files[0].getAbsolutePath(), Integer.toString(0), 0, files);
-    	walkthrough.determineEdgeDetect(Integer.toString(0)); 	
+		if (chooser.showOpenDialog(welcomeFrame) == JFileChooser.APPROVE_OPTION) {
+			// Check to make sure files are jpgs and not txt or anything else
+			File[] files = chooser.getSelectedFiles();
+			System.out.println(files.length);
+			numFiles = files.length;
+			System.out.println(numFiles);  	
+			EdgeDetectFlow walkthrough = new EdgeDetectFlow(files[0].getAbsolutePath(), Integer.toString(0), 0, files);
+			walkthrough.determineEdgeDetect(Integer.toString(0)); 
+		} else {
+			welcomeFrame.setVisible(true);
+		}
     }
-    
     public void imagePreviews() {
     	
     }
@@ -141,8 +143,8 @@ public class UploadGUI implements ActionListener {
     	buttonPanel.setSize(500, 500);
     	entireGUI.add(buttonPanel);
     	
-    	JLabel welcomeText = new JLabel("Processing Visualizer");
-    	JLabel welcomeText2 = new JLabel("Please click next to continue...");
+    	JLabel welcomeText = new JLabel("The Hamulizer");
+    	JLabel welcomeText2 = new JLabel("Upload up to 7 images or use the default set.");
     	welcomeText.setLocation(0, 0);
     	welcomeText.setSize(500, 100);
     	welcomeText.setHorizontalAlignment(0);
@@ -151,8 +153,6 @@ public class UploadGUI implements ActionListener {
     	welcomeText2.setHorizontalAlignment(0);
     	textPanel.add(welcomeText);
     	textPanel.add(welcomeText2);
-    	
-    	//entireGUI.add(bluePanel);
     	
     	nextButton = new JButton("Upload Images");
     	nextButton.setLocation(300, 350);
@@ -174,9 +174,8 @@ public class UploadGUI implements ActionListener {
     public void actionPerformed(ActionEvent e) {
     	if(e.getSource() == nextButton)
     	{
-    		//also could use .dispose()... unsure which atm
-    		//welcomeFrame.setVisible(false);
-    		welcomeFrame.dispose();
+    		//welcomeFrame.dispose();
+    		welcomeFrame.setVisible(false);
     		try {
 				fileUpload();
 			} catch (AWTException e1) {
@@ -187,8 +186,6 @@ public class UploadGUI implements ActionListener {
 				e1.printStackTrace();
 			}
     	} else if(e.getSource() == useDefault) {
-    		//also could use .dispose()... unsure which atm
-    		//welcomeFrame.setVisible(false);
     		welcomeFrame.dispose();
 	    	LoadProcessing useDefaultImages = new LoadProcessing();
 	    	useDefaultImages.useDefaultImages();

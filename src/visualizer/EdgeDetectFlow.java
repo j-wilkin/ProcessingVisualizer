@@ -255,6 +255,7 @@ public class EdgeDetectFlow implements ActionListener {
 			        thumbnailEdges.setLocation(50, 0);
 			        previewPanel.removeAll();
 			        previewPanel.add(thumbnailEdges);
+			        previewPanel.updateUI();
 			        	    	    
 		    	} catch (IOException e1) {
 		    		 // TODO Auto-generated catch block

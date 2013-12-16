@@ -17,7 +17,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import org.monte.media.Format;
@@ -36,12 +35,13 @@ public class UploadGUI implements ActionListener {
 	static int numFiles = 0;
 	ScreenRecorder screenRecorder;
 	boolean recording = false;
+	BufferedImage image1, image2;
 	
 	// Welcome window
     @SuppressWarnings("unused")
 	public UploadGUI(){
     	
-    	welcomeFrame = new JFrame("Welcome to our app!");
+    	welcomeFrame = new JFrame("Welcome to the Hamulizer 1.0");
     	
         welcomeFrame.setSize(500, 500); //The window Dimensions
         welcomeFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -109,9 +109,7 @@ public class UploadGUI implements ActionListener {
 		if (chooser.showOpenDialog(welcomeFrame) == JFileChooser.APPROVE_OPTION) {
 			// Check to make sure files are jpgs and not txt or anything else
 			File[] files = chooser.getSelectedFiles();
-			System.out.println(files.length);
-			numFiles = files.length;
-			System.out.println(numFiles);  	
+			numFiles = files.length; 	
 			EdgeDetectFlow walkthrough = new EdgeDetectFlow(files[0].getAbsolutePath(), Integer.toString(0), 0, files);
 			walkthrough.determineEdgeDetect(Integer.toString(0)); 
 		} else {
@@ -144,15 +142,26 @@ public class UploadGUI implements ActionListener {
     	entireGUI.add(buttonPanel);
     	
     	JLabel welcomeText = new JLabel("The Hamulizer");
-    	JLabel welcomeText2 = new JLabel("Upload up to 7 images or use the default set.");
+    	JLabel welcomeText1 = new JLabel("Transform images into Processing particle sketches, controllable via");
+    	JLabel welcomeText1A = new JLabel("iPad with a built-in physics library.");
+    	JLabel welcomeText2 = new JLabel("Upload up to 7 unique images or use the default set!");
     	welcomeText.setLocation(0, 0);
     	welcomeText.setSize(500, 100);
+    	welcomeText.setFont(new Font("Serif", Font.PLAIN, 30));
     	welcomeText.setHorizontalAlignment(0);
-    	welcomeText2.setLocation(0, 100);
-    	welcomeText2.setSize(500, 100);
+    	welcomeText1.setLocation(0, 100);
+    	welcomeText1.setSize(500, 30);
+    	welcomeText1.setHorizontalAlignment(0);
+    	welcomeText1A.setLocation(0, 130);
+    	welcomeText1A.setSize(500, 30);
+    	welcomeText1A.setHorizontalAlignment(0);
+    	welcomeText2.setLocation(0, 180);
+    	welcomeText2.setSize(500, 50);
     	welcomeText2.setHorizontalAlignment(0);
     	textPanel.add(welcomeText);
-    	textPanel.add(welcomeText2);
+    	textPanel.add(welcomeText1);
+    	textPanel.add(welcomeText1A);
+    	textPanel.add(welcomeText2);	
     	
     	nextButton = new JButton("Upload Images");
     	nextButton.setLocation(300, 350);

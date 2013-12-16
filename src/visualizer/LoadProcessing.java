@@ -90,10 +90,10 @@ public class LoadProcessing {
        
     	// Creates ratio to scale the image up or down
     	if (diffW < diffH) {
-    		ratio = dim.width/startW;
+    		ratio = dim.width/ (float) startW;
     	}
     	else {
-    		ratio = dim.height/startH;
+    		ratio = dim.height/ (float) startH;
     	}   	
     	
     	System.out.println(ratio);

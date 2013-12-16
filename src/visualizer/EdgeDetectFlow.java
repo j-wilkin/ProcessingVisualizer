@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -26,28 +27,21 @@ import net.coobird.thumbnailator.Thumbnails;
 
 @SuppressWarnings("unused")
 public class EdgeDetectFlow implements ActionListener {
-	String filename;
-	String nameExt;
+	String filename, nameExt;
 	int index;
 	File[] files;
 	JFrame edgeFrame;
-	JPanel textPanel;
-	JPanel picturePanel;
-	JPanel previewPanel;
-	JLabel edgeLabel;
-	JLabel edgeLabel2;
-	JLabel imageCont;
-	JButton progressButton;
-	JButton previewButton;
+	JPanel textPanel, picturePanel, previewPanel;
+	JLabel edgeLabel, edgeLabel2, imageCont;
+	JButton progressButton, previewButton;
 	String edgeDetectValue;
 	int edgeLowThres;
 	int edgeHighThres;
-	JSlider edgeLowSlider = new JSlider(JSlider.HORIZONTAL, 0, 20, 10);
-	JSlider edgeHighSlider = new JSlider(JSlider.HORIZONTAL, 0, 20, 10);
+	JSlider edgeLowSlider = new JSlider(JSlider.HORIZONTAL, 1, 20, 10);
+	JSlider edgeHighSlider = new JSlider(JSlider.HORIZONTAL, 1, 20, 10);
 	BufferedImage origImage;
     Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-    Component thumbnailImg;
-    Component thumbnailEdges;
+    Component thumbnailImg, thumbnailEdges;
     
 	public EdgeDetectFlow(String file, String ext, int i, File[] fileList) {
 		filename = file;
@@ -58,9 +52,7 @@ public class EdgeDetectFlow implements ActionListener {
 
 	public void determineEdgeDetect(String num) {
 		edgeFrame = new JFrame("Edge Detection for Image #" + Integer.toString(index + 1));
-    	
-        //edgeFrame.setSize(500, 800); //The window Dimensions
-        edgeFrame.setSize(800, 600);
+        edgeFrame.setSize(800, 550);
         edgeFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         
         // Get size of the screen
@@ -123,12 +115,15 @@ public class EdgeDetectFlow implements ActionListener {
 	    	int startH = origImage.getHeight();
 	    	float ratio = 1;
 
-	    	// Difference in image vs previewbox
+	    	// Difference in image vs previewbox	    	
+	    	int diffH = (200 - startH)/200;
+	    	int diffW = (350 - startW)/350;
+	    	if (diffH < diffW) {
+	    		ratio = (float) (200.0/startH);
+	    	} else {
+	    		ratio = (float) (350.0/startW);
+	    	}
 	    	
-	    	int diffH = 200 - startH;
-	    	ratio = (float) (200.0/startH);
-	    	
-	    	System.out.println(ratio);
 	    	int newW = Math.round(startW * ratio);
 	    	int newH = Math.round(startH * ratio);
 	    	
@@ -139,8 +134,10 @@ public class EdgeDetectFlow implements ActionListener {
 	    	ImageIO.write(thumb, "jpg", outputfile);
 	    	
 	    	// TODO FIGURE OUT THIS WEIRD BUG
+	    	// Since updating graphics on a JFrame already on the screen is very buggy, currently creating a dummy window and deleting it in order to 
+	    	// refresh the view
 	    	JFrame testFrame = new JFrame("temp");
-	    	testFrame.setSize(800, 650);
+	    	testFrame.setSize(800, 525);
 	        testFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	        thumbnailImg =  new LoadGenericImage(outputfile.getCanonicalPath());
     	    testFrame.add(thumbnailImg);
@@ -165,16 +162,24 @@ public class EdgeDetectFlow implements ActionListener {
 	    edgeLowSlider.setMajorTickSpacing(20);
 	    edgeLowSlider.setMinorTickSpacing(2);
 	    edgeLowSlider.setPaintTicks(true);
+
+	    //Create the label table
+	    Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+	    labelTable.put( new Integer( 1 ), new JLabel("More Edges") );
+	    labelTable.put( new Integer( 20 ), new JLabel("Less Edges") );
+	    edgeLowSlider.setLabelTable( labelTable );
 	    edgeLowSlider.setPaintLabels(true);
 	    
-	    edgeLowSlider.setLocation(100, 150);
+	    edgeLowSlider.setPaintLabels(true);
+	    
+	    edgeLowSlider.setLocation(100, 125);
 	    edgeLowSlider.setSize(200, 100);
 	    textPanel.add(edgeLowSlider);
 	    
         edgeLabel2 = new javax.swing.JLabel();
         edgeLabel2.setText("Edge Detect High Threshold: ");
 	    	
-	    edgeLabel2.setLocation(0, 250);
+	    edgeLabel2.setLocation(0, 225);
 	    edgeLabel2.setSize(400, 50);
 	    edgeLabel2.setHorizontalAlignment(0);
 	    textPanel.add(edgeLabel2);
@@ -183,20 +188,22 @@ public class EdgeDetectFlow implements ActionListener {
 	    edgeHighSlider.setMajorTickSpacing(20);
 	    edgeHighSlider.setMinorTickSpacing(2);
 	    edgeHighSlider.setPaintTicks(true);
+
+	    edgeHighSlider.setLabelTable( labelTable );
 	    edgeHighSlider.setPaintLabels(true);
 	    
-	    edgeHighSlider.setLocation(100, 300);
+	    edgeHighSlider.setLocation(100, 275);
 	    edgeHighSlider.setSize(200, 100);
 	    textPanel.add(edgeHighSlider);
 	    
 	    previewButton = new JButton("Preview");
-	    previewButton.setLocation(80, 0);
+	    previewButton.setLocation(70, 0);
 	    previewButton.setSize(100, 50);
 	    previewButton.addActionListener(this);
 	    buttonPanel.add(previewButton);
 	    
 	    progressButton = new JButton("Next");
-	    progressButton.setLocation(240, 0);
+	    progressButton.setLocation(230, 0);
 	    progressButton.setSize(100, 50);
 	    progressButton.addActionListener(this);
 	    buttonPanel.add(progressButton);
@@ -208,26 +215,24 @@ public class EdgeDetectFlow implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == previewButton) {
-			// add image preview
 						
 			int edgeLowThres = edgeLowSlider.getValue();
 			int edgeHighThres = edgeHighSlider.getValue();
-			System.out.println(edgeLowThres);
 			float lowThres = edgeLowThres * 1.0f;
 			float highThres = edgeHighThres * 1.0f;
+
 		    if (lowThres > highThres) {
 		    	JOptionPane.showMessageDialog(edgeFrame, "The low threshold needs to be lower than the high threshold!", "Try again", JOptionPane.ERROR_MESSAGE);
-			} 
-		    else if (lowThres == 0 | highThres == 0) {
-		    	JOptionPane.showMessageDialog(edgeFrame, "The thresholds must be greater than 0!", "Try again", JOptionPane.ERROR_MESSAGE);
 			} else {
 		    	try {
 		    		LoadProcessing createEdgePreview = new LoadProcessing();
 		    		createEdgePreview.getEdges(filename, nameExt, index, files, lowThres, highThres);
 		    	    
 		    	    // TODO FIGURE OUT THIS WEIRD BUG
+			    	// Since updating graphics on a JFrame already on the screen is very buggy, currently creating a dummy window and deleting it in order to 
+			    	// refresh the view
 		    	    JFrame testFrame = new JFrame("temp2");
-			    	testFrame.setSize(800, 650);
+			    	testFrame.setSize(800, 550);
 			        testFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 			        
 			        // Get size of the screen
@@ -242,8 +247,8 @@ public class EdgeDetectFlow implements ActionListener {
 			        // Move the window
 			        testFrame.setLocation(x, y);
 			        
-			        thumbnailEdges =  new LoadGenericImage("thumbedges" + nameExt + ".jpg");
-		    	    testFrame.add(thumbnailEdges);
+			        thumbnailEdges = new LoadGenericImage("thumbedges" + nameExt + ".jpg");			        
+			        testFrame.add(thumbnailEdges);
 			        testFrame.setVisible(true);
 			        testFrame.dispose();
 
@@ -261,7 +266,6 @@ public class EdgeDetectFlow implements ActionListener {
 		else if(e.getSource() == progressButton) {
 			int edgeLowThres = edgeLowSlider.getValue();
 			int edgeHighThres = edgeHighSlider.getValue();
-			System.out.println(edgeLowThres);
 			float lowThres = edgeLowThres * 1.0f;
 			float highThres = edgeHighThres * 1.0f;
 		    if (lowThres > highThres) {

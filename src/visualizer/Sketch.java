@@ -12,16 +12,6 @@ import themidibus.*;
 
 @SuppressWarnings({ "unused", "serial" })
 public class Sketch extends PApplet {
-
-	// Recording variables
-	Image img;
-	double vidRate = 30;
-	int frames = 0;
-	long[] timeStamps;
-	long fTime;
-	long sTime;
-	boolean recording = false;
-
 	// Sketch variables
 
 	float MIN_MASS = 0.4f; // the minimum mass of a particle
@@ -102,6 +92,8 @@ public class Sketch extends PApplet {
 					break;
 				case 14: toggleForceParticles();
 					break;
+				case 18: toggleMouse();
+					break;
 			}
 		
 		// Image Select
@@ -146,6 +138,10 @@ public class Sketch extends PApplet {
 			
 			
 			}
+		
+		else if (channel == 4 && value == 1)
+			if (number == 1)
+				exit();
 		 
 	}
 	
@@ -314,6 +310,13 @@ public class Sketch extends PApplet {
 		noStroke();
 		ellipseMode(CENTER);
 		smooth();
+		
+		// Prevent ghost force particles in the beginning.
+		ATTR = true;
+		toggleForceParticles();
+		
+		// Mouse always starts on.
+		MOUSE = true;
 	}
 	
 	public void transitionImg(String extension){
@@ -325,13 +328,10 @@ public class Sketch extends PApplet {
 		
 		frame.setBackground(new Color(0,0,0));
 		size(displayWidth, displayHeight);
-		// set up an array to hold the time stamps for each frame
-		timeStamps = new long[100000];
 			
 		// GRABS THE LOCATIONS OF PARTICLES FROM THE EDGE-DETECTED PICTURE
 		setImage("0");
 		// precautionary measure to make sure there's no ghost force particles at setup
-		toggleForceParticles();
 		frameRate(60);
 		MidiBus.list();
 		MidiBus myBus = new MidiBus(this, 0, 0);
@@ -503,24 +503,6 @@ public class Sketch extends PApplet {
 		} else {
 			TIME2 += 1;
 		}
-
-		if (recording) {
-	        // set up current time
-			long cTime = System.nanoTime()-fTime;
-	        
-	        // for debugging
-	        //stri = String.valueOf(frames);
-	        //text(stri,10,10);
-	        
-	        if (cTime >= (double)1000/vidRate) { 
-	        	// save image to file
-	            save("pics/img"+frames+".jpg");
-	            // store time stamp of each frame
-	            timeStamps[frames] = System.nanoTime();
-	            frames++;
-	        }
-	        fTime = System.nanoTime();
-		}
 		
 		if (FADEOUT) {
 			FADEIN = false;
@@ -587,36 +569,15 @@ public class Sketch extends PApplet {
 		if (key == '/') RAINBOW = !RAINBOW;
 
 		// increase or decrease trail length
-		if (key == '-' && TR_LEN > 4) {
+		if (key == '=' && TR_LEN > 4) {
 			TR_LEN -= 5;
 		}
-		if (key == '=' && TR_LEN < 251) {
+		if (key == '-' && TR_LEN < 251) {
 			TR_LEN += 5;
 		}
 
 		// turn on waves/turn off image particles
 		if (key == 'w') WAVE = !WAVE;
-		
-		//press 'r' to start/stop recording
-		if (key == 'r') {
-		     if(!recording){
-		        recording = true;
-		        boolean success = (new File("pics")).mkdir();
-		        frames = 0;
-		        sTime = fTime = System.nanoTime();
-		     }
-		     else{
-		    	recording = false;
-		     }
-		  }
-		// press 's' to export
-		if (key == 's') {
-		     if(recording)
-		        recording = false;
-		     for(int i=0; i<11; i++){
-		    	 new encodeVideo(frames, vidRate, sTime, timeStamps);
-		     }
-		}
 
 
 		if (key == '1'){

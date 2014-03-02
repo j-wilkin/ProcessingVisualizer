@@ -28,6 +28,7 @@ public class Sketch extends PApplet {
 	boolean MOUSE = true;
 	boolean DGRAV, UGRAV, LGRAV, RGRAV = false;
 	boolean FORCEVISIBLE = true;
+	boolean FULLSCREEN = true;
 	boolean FADEOUT = false;
 	boolean FADEIN = false;
 	String NEXTIMG;
@@ -167,6 +168,17 @@ public class Sketch extends PApplet {
 		    }
 		}
 	}
+	
+	public void toggleFullScreen(){
+		if (FULLSCREEN) {
+			frame.setSize(1920, 1080);
+		}
+		else {
+			sketchFullScreen();
+		}
+		FULLSCREEN = !FULLSCREEN;
+	}
+	
 	public void toggleForceVisible(){
 		if (FORCEVISIBLE == true){
 			FORCEVISIBLE = false;
@@ -591,9 +603,10 @@ public class Sketch extends PApplet {
 		// turn on waves/turn off image particles
 		if (key == 'w') WAVE = !WAVE;
 
-		if (key == 'i'){
-			toggleForceVisible();
-		}
+		// toggle fullscreen
+		if (key == 'a') toggleFullScreen();
+		
+		if (key == 'i') toggleForceVisible();
 		
 		if (key == '1'){
 			FADEOUT = true;

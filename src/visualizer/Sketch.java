@@ -350,6 +350,7 @@ public class Sketch extends PApplet {
 		
 		frame.setBackground(new Color(0,0,0));
 		size(displayWidth, displayHeight);
+		frame.setSize(displayWidth, displayHeight);
 			
 		// GRABS THE LOCATIONS OF PARTICLES FROM THE EDGE-DETECTED PICTURE
 		setImage("0");

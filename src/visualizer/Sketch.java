@@ -27,7 +27,7 @@ public class Sketch extends PApplet {
 	boolean RAINBOW = false;
 	boolean MOUSE = true;
 	boolean DGRAV, UGRAV, LGRAV, RGRAV = false;
-	
+	boolean FORCEVISIBLE = true;
 	boolean FADEOUT = false;
 	boolean FADEIN = false;
 	String NEXTIMG;
@@ -93,6 +93,8 @@ public class Sketch extends PApplet {
 				case 14: toggleForceParticles();
 					break;
 				case 18: toggleMouse();
+					break;
+				case 19: toggleForceVisible();
 					break;
 			}
 		
@@ -163,6 +165,14 @@ public class Sketch extends PApplet {
 		    for (int i=0; i<attrPartNum; i++) {
 		    	attrForces[i].turnOn();
 		    }
+		}
+	}
+	public void toggleForceVisible(){
+		if (FORCEVISIBLE == true){
+			FORCEVISIBLE = false;
+		}
+		else{
+			FORCEVISIBLE = true;
 		}
 	}
 	
@@ -383,7 +393,9 @@ public class Sketch extends PApplet {
 					attrParticles[i].velocity().set(0,ATTRV[1][i],0);
 				}
 				// display the force particle
-				fill(255, 255, 255, 255);
+				if (FORCEVISIBLE)
+					fill(255, 255, 255, 255);
+				
 				ellipse(attrParticles[i].position().x(),attrParticles[i].position().y(),5,5);
 			}
 		}
@@ -579,7 +591,10 @@ public class Sketch extends PApplet {
 		// turn on waves/turn off image particles
 		if (key == 'w') WAVE = !WAVE;
 
-
+		if (key == 'i'){
+			toggleForceVisible();
+		}
+		
 		if (key == '1'){
 			FADEOUT = true;
 			NEXTIMG = "0";
